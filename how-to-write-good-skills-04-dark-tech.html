@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如何写好 Agent Skill</title>
+
+  <!-- Reveal.js 核心 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/theme/black.css">
+
+  <!-- Google Fonts: 技术字体 -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
+  <style>
+    :root {
+      --primary: oklch(75% 0.14 230);
+      --primary-light: oklch(85% 0.10 230);
+      --primary-dark: oklch(55% 0.16 230);
+      --bg: oklch(15% 0.02 250);
+      --bg-subtle: oklch(20% 0.02 250);
+      --bg-elevated: oklch(25% 0.02 250);
+      --text: oklch(95% 0.01 250);
+      --text-muted: oklch(65% 0.03 250);
+      --text-dim: oklch(45% 0.02 250);
+      --accent: oklch(80% 0.15 175);
+      --accent-secondary: oklch(70% 0.12 280);
+      --success: oklch(75% 0.15 145);
+      --warning: oklch(80% 0.15 85);
+      --error: oklch(70% 0.18 25);
+      --grid-line: oklch(30% 0.01 250);
+      --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+      --font-sans: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+      --gradient-primary: linear-gradient(135deg, oklch(75% 0.14 230), oklch(80% 0.15 175));
+      --gradient-bg: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 100%);
+      --space-xs: 0.5em;
+      --space-sm: 1em;
+      --space-md: 1.5em;
+      --space-lg: 2em;
+      --space-xl: 3em;
+      --text-xs: 0.7rem;
+      --text-sm: 0.8rem;
+      --text-base: 0.9rem;
+      --text-lg: 1rem;
+      --text-xl: 1.2rem;
+      --text-2xl: 1.5rem;
+      --text-3xl: 2rem;
+      --text-4xl: 2.5rem;
+    }
+
+    .reveal {
+      font-family: var(--font-sans);
+      font-size: 24px;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .reveal .slides { text-align: left; }
+
+    .reveal section {
+      padding: var(--space-lg) var(--space-xl);
+      height: 100%;
+      box-sizing: border-box;
+      background: var(--bg);
+    }
+
+    .reveal section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .reveal section > * { position: relative; z-index: 1; }
+
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+      font-family: var(--font-sans);
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .reveal h1 { font-size: var(--text-4xl); }
+    .reveal h2 { font-size: var(--text-2xl); font-weight: 600; margin-bottom: var(--space-sm); }
+    .reveal h3 { font-size: var(--text-xl); font-weight: 600; color: var(--text); }
+    .reveal p { font-size: var(--text-base); line-height: 1.6; margin-bottom: var(--space-xs); }
+
+    .reveal .subtitle {
+      font-size: var(--text-xl);
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-bottom: var(--space-lg);
+    }
+
+    .reveal .meta {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      color: var(--text-dim);
+    }
+
+    .reveal pre {
+      font-size: var(--text-xs);
+      box-shadow: none;
+      margin: 1em 0;
+    }
+
+    .reveal pre code {
+      font-family: var(--font-mono);
+      padding: 1em 1.5em;
+      background: var(--bg-subtle);
+      border: 1px solid var(--grid-line);
+      border-radius: 4px;
+      line-height: 1.5;
+    }
+
+    .code-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--accent);
+      background: var(--bg-subtle);
+      padding: 0.3em 0.6em;
+      border-radius: 2px 2px 0 0;
+      border: 1px solid var(--grid-line);
+      border-bottom: none;
+      display: inline-block;
+      margin-bottom: -1px;
+    }
+
+    .keyword { color: var(--accent); }
+    .function { color: var(--primary-light); }
+    .string { color: var(--success); }
+    .comment { color: var(--text-dim); font-style: italic; }
+    .number { color: var(--warning); }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3em;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      padding: 0.3em 0.7em;
+      border-radius: 3px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--grid-line);
+      color: var(--text);
+      min-width: 0;
+    }
+
+    .tag.primary { background: var(--primary); border-color: var(--primary); color: var(--bg); }
+    .tag.accent { background: transparent; border-color: var(--accent); color: var(--accent); }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-sm);
+      margin: var(--space-md) 0;
+    }
+
+    .metrics-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .metrics-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+    .metric-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--grid-line);
+      border-radius: 6px;
+      padding: var(--space-sm);
+      text-align: center;
+      font-size: 0.85em;
+    }
+
+    .metric-card .icon { color: var(--accent); font-size: 1.5em; margin-bottom: 0.3em; }
+    .metric-card .title { font-weight: 600; margin-bottom: 0.3em; }
+    .metric-card .desc { font-size: var(--text-sm); color: var(--text-muted); }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      flex-wrap: wrap;
+      margin: var(--space-md) 0;
+    }
+
+    .flow-step {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      padding: 0.6em 1em;
+      background: var(--bg-subtle);
+      border: 1px solid var(--grid-line);
+      border-radius: 4px;
+      color: var(--text);
+      flex-shrink: 0;
+      min-width: 0;
+    }
+
+    .flow-step.active { background: var(--primary); border-color: var(--primary); color: var(--bg); }
+    .flow-arrow { color: var(--text-dim); font-size: var(--text-lg); }
+
+    .arch-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+      align-items: center;
+      margin: 1.5em 0;
+    }
+
+    .arch-layer { display: flex; gap: 0.5em; flex-wrap: wrap; justify-content: center; }
+
+    .arch-node {
+      font-family: var(--font-mono);
+      font-size: 0.7em;
+      padding: 0.5em 1.2em;
+      border-radius: 4px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--grid-line);
+      color: var(--text);
+      min-width: 0;
+    }
+
+    .arch-node.highlight { background: var(--primary); border-color: var(--primary); color: var(--bg); }
+    .arch-connector { color: var(--text-dim); font-size: 1.5em; line-height: 0.5; }
+
+    .title-slide {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      background: linear-gradient(135deg, var(--bg) 0%, var(--bg-elevated) 100%);
+    }
+
+    .title-slide::before { background: radial-gradient(ellipse at 20% 80%, rgba(75, 100, 230, 0.08) 0%, transparent 50%); }
+
+    .title-slide .badge-row { display: flex; gap: 0.5em; margin-bottom: 1.5em; }
+    .title-slide h1 { font-size: 2.8em; margin-bottom: 0.3em; }
+    .title-slide .subtitle { font-size: 1.3em; font-weight: 400; color: var(--text-muted); margin-bottom: 2em; }
+    .title-slide .meta { font-family: var(--font-mono); font-size: 0.8em; color: var(--text-dim); }
+
+    .two-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2em; }
+
+    .feature-list { list-style: none; padding: 0; margin: 0; }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8em;
+      margin-bottom: 1em;
+      font-size: 0.9em;
+    }
+
+    .feature-list .icon { color: var(--accent); flex-shrink: 0; margin-top: 0.2em; }
+
+    .reveal ul { list-style: none; padding-left: 0; }
+    .reveal ul li { position: relative; padding-left: 1.5em; margin-bottom: 0.6em; }
+    .reveal ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent); font-weight: bold; }
+
+    .comparison-box { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-md); margin: var(--space-md) 0; }
+    .comparison-box .box { padding: var(--space-sm); border-radius: 6px; border: 1px solid var(--grid-line); }
+    .comparison-box .box.error { background: rgba(200, 50, 50, 0.1); border-color: var(--error); }
+    .comparison-box .box.success { background: rgba(50, 180, 100, 0.1); border-color: var(--success); }
+    .comparison-box .box-label { font-family: var(--font-mono); font-size: var(--text-xs); margin-bottom: 0.5em; }
+    .comparison-box .box.error .box-label { color: var(--error); }
+    .comparison-box .box.success .box-label { color: var(--success); }
+
+    .pattern-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--grid-line);
+      border-left: 3px solid var(--primary);
+      border-radius: 0 8px 8px 0;
+      padding: 1.2em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .pattern-card .pattern-name { font-family: var(--font-mono); font-size: var(--text-base); color: var(--primary-light); margin-bottom: 0.5em; }
+    .pattern-card .pattern-desc { font-size: var(--text-sm); color: var(--text-muted); }
+
+    .chapter-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-sm);
+      padding: 0.4em 0.8em;
+      border-left: 3px solid var(--accent);
+    }
+
+    .layout-tight section { padding: var(--space-sm) var(--space-md); }
+    .layout-tight h2 { font-size: 1.3em; margin-bottom: var(--space-xs); }
+    .layout-tight .metrics { gap: var(--space-xs); margin: var(--space-sm) 0; }
+    .layout-tight .metric-card { padding: var(--space-xs); }
+
+    .layout-breathing section { padding: var(--space-xl) var(--space-xl); }
+    .layout-breathing h2 { font-size: 2em; margin-bottom: var(--space-sm); }
+
+    .reveal .fragment { transition-timing-function: var(--ease-out-expo); transition-duration: 350ms; }
+    .reveal .fragment.slide-left { opacity: 0; transform: translateX(-30px); }
+    .reveal .fragment.slide-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal .fragment.scale-up { opacity: 0; transform: scale(0.9); }
+    .reveal .fragment.scale-up.visible { opacity: 1; transform: scale(1); }
+
+    .reveal .progress { color: var(--primary); height: 2px; }
+    .reveal .controls { color: var(--primary); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal .fragment { opacity: 1 !important; transform: none !important; transition: opacity 200ms ease-out !important; }
+      .reveal .slides section { transition: none !important; }
+    }
+
+    .metric-card { transition: transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo), border-color 200ms ease; cursor: default; }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); border-color: var(--primary); }
+    .flow-step { transition: transform 150ms var(--ease-out-expo), background 150ms ease, border-color 150ms ease; }
+    .flow-step:hover { transform: translateY(-1px); }
+    .pattern-card { transition: transform 200ms var(--ease-out-expo), border-left-color 200ms ease; }
+    .pattern-card:hover { transform: translateX(2px); }
+
+    .four-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); margin: var(--space-md) 0; }
+    .four-grid .item { background: var(--bg-subtle); border: 1px solid var(--grid-line); border-radius: 6px; padding: var(--space-sm); }
+    .four-grid .item-title { font-weight: 600; margin-bottom: 0.3em; color: var(--primary-light); }
+    .four-grid .item-desc { font-size: var(--text-sm); color: var(--text-muted); }
+
+    .choice-table { width: 100%; margin: var(--space-md) 0; font-size: var(--text-sm); }
+    .choice-table th { text-align: left; color: var(--text-muted); font-weight: 500; padding: 0.5em 1em 0.5em 0; border-bottom: 1px solid var(--grid-line); }
+    .choice-table td { padding: 0.5em 1em 0.5em 0; border-bottom: 1px solid var(--grid-line); }
+    .choice-table td:first-child { color: var(--accent); font-family: var(--font-mono); }
+
+    .summary-points { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); margin: var(--space-md) 0; }
+    .summary-point { display: flex; align-items: center; gap: 0.8em; background: var(--bg-subtle); border: 1px solid var(--grid-line); border-radius: 6px; padding: var(--space-sm); }
+    .summary-point .num { font-family: var(--font-mono); font-size: 1.5em; font-weight: 700; color: var(--primary); }
+    .summary-point .text { font-size: var(--text-base); }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- Slide 1: 标题页 -->
+      <section class="title-slide" data-background="var(--bg)">
+        <div class="badge-row fragment scale-up">
+          <span class="tag primary"><i class="fas fa-bolt"></i> 设计模式</span>
+          <span class="tag accent"><i class="fas fa-rocket"></i> 经验案例</span>
+        </div>
+        <h1 class="fragment slide-left" style="transition-delay: 100ms;">如何写好 Agent Skill</h1>
+        <p class="subtitle fragment slide-left" style="transition-delay: 200ms;">设计模式 · 经验案例</p>
+        <div class="meta fragment slide-left" style="transition-delay: 300ms;">Based on Google Cloud Tech &amp; Anthropic Claude Code</div>
+      </section>
+
+      <!-- Slide 2: 常见的 9 种 Skill 类型 -->
+      <section class="layout-tight" data-background="var(--bg)">
+        <h2 class="fragment slide-left">常见的 9 种 Skill 类型</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">最好的 Skill 清晰地落在某一个类别里</p>
+        <div class="metrics" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+          <div class="metric-card fragment scale-up" style="transition-delay: 150ms;">
+            <div class="icon"><i class="fas fa-book"></i></div><div class="title">库与 API 参考</div><div class="desc">踩坑点、边界情况、使用示例</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 200ms;">
+            <div class="icon"><i class="fas fa-check-double"></i></div><div class="title">产品验证</div><div class="desc">Playwright、状态断言、视频录制</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 250ms;">
+            <div class="icon"><i class="fas fa-chart-bar"></i></div><div class="title">数据获取与分析</div><div class="desc">仪表盘 ID、查询模式、数据源</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 300ms;">
+            <div class="icon"><i class="fas fa-cogs"></i></div><div class="title">业务流程自动化</div><div class="desc">站会、创建工单、周报生成</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 350ms;">
+            <div class="icon"><i class="fas fa-code"></i></div><div class="title">代码脚手架</div><div class="desc">模板生成、框架搭建</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 400ms;">
+            <div class="icon"><i class="fas fa-search"></i></div><div class="title">代码质量审查</div><div class="desc">风格审查、测试实践、对抗审查</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 450ms;">
+            <div class="icon"><i class="fas fa-ship"></i></div><div class="title">CI/CD 与部署</div><div class="desc">监控 PR、构建部署、流量切换</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 500ms;">
+            <div class="icon"><i class="fas fa-clipboard-list"></i></div><div class="title">运维手册</div><div class="desc">多工具排查流程、结构化报告</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 550ms;">
+            <div class="icon"><i class="fas fa-server"></i></div><div class="title">基础设施运维</div><div class="desc">日常维护、破坏性操作、安全护栏</div>
+          </div>
+        </div>
+        <p class="fragment slide-left" style="transition-delay: 600ms; font-size: 0.85em; color: var(--accent);">横跨多个类别的 Skill 容易让人困惑——每个 Skill 应只属于一种类型</p>
+      </section>
+
+      <!-- Slide 3: Skill 是一个文件夹系统 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">Skill 是一个文件夹系统</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1.5em;">SKILL.md 只是入口，真正的价值在：</p>
+        <div class="two-col">
+          <div class="feature-list fragment slide-left" style="transition-delay: 150ms;">
+            <li><i class="fas fa-folder-open icon"></i><div><strong>references/</strong><br><span style="color: var(--text-muted); font-size: 0.8em;">详细参考文档，按需加载</span></div></li>
+            <li><i class="fas fa-copy icon"></i><div><strong>assets/</strong><br><span style="color: var(--text-muted); font-size: 0.8em;">模板文件，供复制使用</span></div></li>
+            <li><i class="fas fa-terminal icon"></i><div><strong>scripts/</strong><br><span style="color: var(--text-muted); font-size: 0.8em;">可执行脚本，封装复用逻辑</span></div></li>
+            <li><i class="fas fa-hook icon"></i><div><strong>hooks/</strong><br><span style="color: var(--text-muted); font-size: 0.8em;">按需钩子，skill 激活时生效</span></div></li>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: center;" class="fragment scale-up" style="transition-delay: 250ms;">
+            <div class="tag primary" style="font-size: 1em; padding: 0.8em 1.5em;"><i class="fas fa-layer-group"></i> Progressive Disclosure</div>
+          </div>
+        </div>
+        <p class="fragment slide-left" style="transition-delay: 350ms; font-size: 0.85em; color: var(--text-muted); margin-top: 1em;">分层加载，只在需要时才读取引用文件</p>
+      </section>
+
+      <!-- Slide 4: SKILL.md 的标准格式 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">SKILL.md 的标准格式</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">每个 skill 都以 SKILL.md 作为入口文件</p>
+        <div class="two-col" style="margin-top: 1.5em;">
+          <div class="fragment slide-left" style="transition-delay: 150ms;">
+            <div class="code-label">SKILL.md 结构</div>
+            <pre><code class="markdown">---
+name: skill-name
+description: 触发条件
+version: 1.0.0
+category: 技能类别
+---
+
+# 正文</code></pre>
+          </div>
+          <div class="fragment slide-left" style="transition-delay: 250ms;">
+            <div class="pattern-card"><div class="pattern-name">YAML Frontmatter</div><div class="pattern-desc">SKILL.md 顶部的元数据区</div></div>
+            <div class="pattern-card"><div class="pattern-name">Markdown Body</div><div class="pattern-desc">分章节描述工作流程</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 5: Skill 如何被触发 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">Skill 如何被触发</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1.5em;">description 是触发条件，不是功能说明——要写用户会说的话</p>
+        <div class="comparison-box fragment slide-left" style="transition-delay: 150ms;">
+          <div class="box error"><div class="box-label"><i class="fas fa-times-circle"></i> 错误示范</div><div style="font-size: 0.85em;">提供有关 hook 的使用指导</div></div>
+          <div class="box success"><div class="box-label"><i class="fas fa-check-circle"></i> 正确示范</div><div style="font-size: 0.85em;">当用户说「创建一个 hook」、「添加 PreToolUse hook」时使用</div></div>
+        </div>
+        <div class="flow-row fragment slide-left" style="transition-delay: 300ms; justify-content: center;">
+          <span class="flow-step">路径匹配</span><span class="flow-arrow">—</span><span class="flow-step">管文件触发</span>
+          <span style="margin: 0 0.5em; color: var(--text-dim);">|</span>
+          <span class="flow-step">description</span><span class="flow-arrow">—</span><span class="flow-step">管语义触发</span>
+        </div>
+      </section>
+
+      <!-- Slide 6: 好 Description 的四要素 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">好 Description 的四要素</h2>
+        <div class="four-grid" style="margin-top: 1.5em;">
+          <div class="item fragment scale-up" style="transition-delay: 100ms;"><div class="item-title"><i class="fas fa-comment"></i> 具体短语</div><div class="item-desc">用户会说的话</div></div>
+          <div class="item fragment scale-up" style="transition-delay: 150ms;"><div class="item-title"><i class="fas fa-language"></i> 多语言触发</div><div class="item-desc">中文、英文、口语化</div></div>
+          <div class="item fragment scale-up" style="transition-delay: 200ms;"><div class="item-title"><i class="fas fa-bullseye"></i> 适用场景</div><div class="item-desc">tech talks、demos、内部汇报</div></div>
+          <div class="item fragment scale-up" style="transition-delay: 250ms;"><div class="item-title"><i class="fas fa-ban"></i> 避免模糊词</div><div class="item-desc">不写 helps with、provides</div></div>
+        </div>
+      </section>
+
+      <!-- Slide 7: 章节 I：五种设计模式 -->
+      <section class="title-slide layout-breathing" data-background="var(--bg)">
+        <div class="chapter-label fragment scale-up" style="transition-delay: 50ms;">CHAPTER I</div>
+        <h1 class="fragment slide-left" style="transition-delay: 150ms; font-size: 2.5em;">五种设计模式</h1>
+        <p class="subtitle fragment slide-left" style="transition-delay: 250ms;">先选模式，再按模式写 skill</p>
+      </section>
+
+      <!-- Slide 8: 五种模式 × 核心问题 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">五种模式 × 核心问题</h2>
+        <div class="metrics" style="grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 1.5em;">
+          <div class="metric-card fragment scale-up" style="transition-delay: 100ms;"><div class="icon"><i class="fas fa-box"></i></div><div class="title" style="color: var(--primary-light);">Tool Wrapper</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 150ms;"><div class="icon"><i class="fas fa-file-alt"></i></div><div class="title" style="color: var(--primary-light);">Generator</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 200ms;"><div class="icon"><i class="fas fa-search"></i></div><div class="title" style="color: var(--primary-light);">Reviewer</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 250ms;"><div class="icon"><i class="fas fa-exchange-alt"></i></div><div class="title" style="color: var(--primary-light);">Inversion</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 300ms;"><div class="icon"><i class="fas fa-stream"></i></div><div class="title" style="color: var(--primary-light);">Pipeline</div></div>
+        </div>
+        <div style="margin-top: 1.5em;" class="fragment slide-left" style="transition-delay: 350ms;">
+          <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.8em; font-size: 0.7em; color: var(--text-muted); text-align: center;">
+            <div>如何正确使用<br>某个库/框架？</div>
+            <div>如何让输出<br>结构一致？</div>
+            <div>如何让检查<br>标准可替换？</div>
+            <div>如何避免 AI<br>盲目开始？</div>
+            <div>如何强制严格<br>按顺序执行？</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 9: 模式 1：Tool Wrapper -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left"><span class="tag primary" style="margin-right: 0.5em;">1</span>Tool Wrapper</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">让 Agent 立刻成为某个库或框架的专家</p>
+        <div class="fragment slide-left" style="transition-delay: 150ms; font-size: 0.9em; margin-bottom: 1.5em;">与其把 API 约定硬编码进 system prompt，不如把这些知识封装成 skill。只有当 Agent 真正处理相关技术时，才加载上下文。</div>
+        <div class="flow-row fragment slide-left" style="transition-delay: 250ms; justify-content: center;">
+          <span class="flow-step">用户 Prompt</span><span class="flow-arrow">→</span><span class="flow-step">关键词匹配</span><span class="flow-arrow">→</span><span class="flow-step">加载 references/</span><span class="flow-arrow">→</span><span class="flow-step active">执行规范</span>
+        </div>
+        <div class="fragment slide-left" style="transition-delay: 350ms; margin-top: 1.5em; font-size: 0.85em; color: var(--accent);"><i class="fas fa-star"></i> 最容易实现的一种模式。把团队内部编码规范、框架最佳实践，直接分发到开发者工作流中。</div>
+      </section>
+
+      <!-- Slide 10: 模式 2：Generator -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left"><span class="tag primary" style="margin-right: 0.5em;">2</span>Generator</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">基于可复用模板，生成结构化文档</p>
+        <div class="fragment slide-left" style="transition-delay: 150ms; font-size: 0.85em; margin-bottom: 1em;">Agent 每次生成的文档结构都不一样。通过「模板填空」流程，把输出稳定下来。</div>
+        <div class="arch-diagram fragment slide-left" style="transition-delay: 200ms;">
+          <div class="arch-layer"><span class="arch-node">加载 references/style-guide.md</span><span class="arch-node">加载 assets/template.md</span></div>
+          <div class="arch-connector">↓</div>
+          <div class="arch-layer"><span class="arch-node">向用户补齐缺失变量</span></div>
+          <div class="arch-connector">↓</div>
+          <div class="arch-layer"><span class="arch-node highlight">按模板填充内容并输出</span></div>
+        </div>
+        <div class="tag fragment slide-left" style="transition-delay: 350ms; margin-top: 1em;"><i class="fas fa-lightbulb"></i> 适合：API 文档、commit message、项目骨架</div>
+      </section>
+
+      <!-- Slide 11: 模式 3：Reviewer -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left"><span class="tag primary" style="margin-right: 0.5em;">3</span>Reviewer</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">按照检查清单，对代码进行评审</p>
+        <div class="comparison-box fragment slide-left" style="transition-delay: 150ms;">
+          <div class="box error"><div class="box-label">传统方式</div><div style="font-size: 0.8em;">在 system prompt 里塞进一长串规则 → 难以维护</div></div>
+          <div class="box success"><div class="box-label">Reviewer 方式</div><div style="font-size: 0.8em;">检查标准外置 → 换一套 checklist 立刻变成另一种评审</div></div>
+        </div>
+        <div class="flow-row fragment slide-left" style="transition-delay: 250ms; justify-content: center;">
+          <span class="flow-step">代码</span><span class="flow-arrow">→</span><span class="flow-step">加载 checklist</span><span class="flow-arrow">→</span><span class="flow-step">逐项检查</span><span class="flow-arrow">→</span><span class="flow-step active">按严重程度输出</span>
+        </div>
+        <div class="fragment slide-left" style="transition-delay: 350ms; margin-top: 1em; font-size: 0.85em; color: var(--accent);"><i class="fas fa-magic"></i> Python 风格检查表 → OWASP 安全检查表 = 安全审计专家</div>
+      </section>
+
+      <!-- Slide 12: 模式 4：Inversion -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left"><span class="tag primary" style="margin-right: 0.5em;">4</span>Inversion</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">在动手之前，先由 Agent 来「采访」你</p>
+        <div class="fragment slide-left" style="transition-delay: 150ms; font-size: 0.85em; margin-bottom: 1.5em;">Agent 不再立刻执行，而是先收集上下文。按阶段提问，在用户完整回答前禁止开始构建。</div>
+        <div class="metrics" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+          <div class="metric-card fragment scale-up" style="transition-delay: 200ms;"><div style="font-family: var(--font-mono); color: var(--primary-light); margin-bottom: 0.5em;">阶段 1</div><div class="title">问题发现</div><div class="desc">Q1 - Q3</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 250ms;"><div style="font-family: var(--font-mono); color: var(--primary-light); margin-bottom: 0.5em;">阶段 2</div><div class="title">技术约束</div><div class="desc">Q4 - Q6</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 300ms;"><div style="font-family: var(--font-mono); color: var(--primary-light); margin-bottom: 0.5em;">阶段 3</div><div class="title">方案整合</div><div class="desc">—</div></div>
+        </div>
+        <div class="tag accent fragment slide-left" style="transition-delay: 400ms; margin-top: 1.5em;"><i class="fas fa-door-closed"></i> 门禁式指令：在所有阶段完成之前，不要开始构建</div>
+      </section>
+
+      <!-- Slide 13: 模式 5：Pipeline -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left"><span class="tag primary" style="margin-right: 0.5em;">5</span>Pipeline</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">通过检查点，强制执行严格的多步骤流程</p>
+        <div class="fragment slide-left" style="transition-delay: 150ms; font-size: 0.85em; margin-bottom: 1.5em;">复杂任务最怕步骤被跳过、指令被忽视。Pipeline 用显式检查点确保无法绕过。</div>
+        <div class="flow-row fragment slide-left" style="transition-delay: 250ms; justify-content: center;">
+          <span class="flow-step active">Step 1</span><span class="flow-arrow">→</span><span class="flow-step active">Step 2</span><span class="flow-arrow">→</span><span class="flow-step active">Step 3</span><span class="flow-arrow">→</span><span class="flow-step active">Step 4</span>
+        </div>
+        <div class="tag accent fragment slide-left" style="transition-delay: 350ms; margin-top: 1.5em;"><i class="fas fa-exclamation-triangle"></i> 菱形门禁条件：上一步未确认 → 禁止进入下一步</div>
+      </section>
+
+      <!-- Slide 14: 如何选择正确的模式？ -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">如何选择正确的模式？</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1.5em;">你的 skill 主要解决什么问题？</p>
+        <table class="choice-table fragment slide-left" style="transition-delay: 150ms;">
+          <thead><tr><th style="width: 40%;">你的问题</th><th>对应模式</th></tr></thead>
+          <tbody>
+            <tr><td>「AI 不知道用什么 API？」</td><td style="color: var(--accent);">→ Tool Wrapper</td></tr>
+            <tr><td>「每次输出格式不一样？」</td><td style="color: var(--accent);">→ Generator</td></tr>
+            <tr><td>「检查标准不好切换？」</td><td style="color: var(--accent);">→ Reviewer</td></tr>
+            <tr><td>「AI 还没搞懂就开干？」</td><td style="color: var(--accent);">→ Inversion</td></tr>
+            <tr><td>「步骤总被跳过？」</td><td style="color: var(--accent);">→ Pipeline</td></tr>
+          </tbody>
+        </table>
+        <div class="fragment slide-left" style="transition-delay: 300ms; margin-top: 1.5em; font-size: 0.85em; color: var(--accent);"><i class="fas fa-random"></i> 这些模式可以自由组合：Pipeline skill 末尾加 Reviewer 步骤，或 Generator 最开始套用 Inversion 先提问收集变量。</div>
+      </section>
+
+      <!-- Slide 15: 章节 II：进阶技巧 -->
+      <section class="title-slide layout-breathing" data-background="var(--bg)">
+        <div class="chapter-label fragment scale-up" style="transition-delay: 50ms;">CHAPTER II</div>
+        <h1 class="fragment slide-left" style="transition-delay: 150ms; font-size: 2.5em;">进阶技巧</h1>
+        <p class="subtitle fragment slide-left" style="transition-delay: 250ms;">编写技巧 &amp; 案例</p>
+      </section>
+
+      <!-- Slide 16: 渐进式披露 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">渐进式披露</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 0.5em;">Skill 是文件夹，不只是 markdown</p>
+        <div class="metrics" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+          <div class="metric-card fragment scale-up" style="transition-delay: 150ms;"><div class="icon"><i class="fas fa-folder-open"></i></div><div class="title">references/</div><div class="desc">函数签名、用法示例，按需加载</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 200ms;"><div class="icon"><i class="fas fa-copy"></i></div><div class="title">assets/</div><div class="desc">输出模板，供复制使用</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 250ms;"><div class="icon"><i class="fas fa-terminal"></i></div><div class="title">scripts/</div><div class="desc">辅助函数库，封装复用逻辑</div></div>
+        </div>
+        <div class="fragment slide-left" style="transition-delay: 350ms; margin-top: 1.5em; font-size: 0.85em;">
+          <p style="color: var(--accent);"><i class="fas fa-lightbulb"></i> 告诉 Claude 有哪些文件 → 它在需要时读取</p>
+          <p style="color: var(--text-muted);">节省上下文窗口</p>
+        </div>
+      </section>
+
+      <!-- Slide 17: 考虑好初始设置 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">考虑好初始设置</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1.5em;">有些 Skills 可能需要用户提供上下文来完成初始设置</p>
+        <div class="two-col">
+          <div class="pattern-card fragment slide-left" style="transition-delay: 150ms;"><div class="pattern-name">config.json</div><div class="pattern-desc">把设置信息存在 Skill 目录下。如果配置还没设置好，智能体就会向用户询问相关信息</div></div>
+          <div class="pattern-card fragment slide-left" style="transition-delay: 250ms;"><div class="pattern-name">AskUserQuestion</div><div class="pattern-desc">如果希望智能体向用户展示结构化的多选题，可以让 Claude 使用此工具</div></div>
+        </div>
+        <div class="tag fragment slide-left" style="transition-delay: 350ms; margin-top: 1.5em;"><i class="fas fa-comment"></i> 范例：站会发送到 Slack → 先问用户「要发到哪个频道？」</div>
+      </section>
+
+      <!-- Slide 18: 记忆与数据存储 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">记忆与数据存储</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">有些 Skills 可以通过在内部存储数据来实现某种形式的记忆</p>
+        <div class="two-col" style="margin-top: 1em;">
+          <div class="pattern-card fragment slide-left" style="transition-delay: 150ms;"><div class="pattern-name"><i class="fas fa-file-alt"></i> 简单方式</div><div class="pattern-desc">只追加写入的日志文件（.log）或 JSON 文件</div></div>
+          <div class="pattern-card fragment slide-left" style="transition-delay: 250ms;"><div class="pattern-name"><i class="fas fa-database"></i> 复杂方式</div><div class="pattern-desc">SQLite 数据库</div></div>
+        </div>
+        <div class="fragment slide-left" style="transition-delay: 350ms; margin-top: 1.5em; font-size: 0.85em;">
+          <p style="color: var(--accent);"><i class="fas fa-star"></i> 范例：standup-post Skill 保留 standups.log，记录写过的每条站会汇报，下次运行读取历史→知道昨天到现在 的变化</p>
+        </div>
+        <div class="tag primary fragment slide-left" style="transition-delay: 450ms; margin-top: 1em;">CLAUDE_PLUGIN_DATA — 每个插件的稳定数据存储目录，升级时不会被删除</div>
+      </section>
+
+      <!-- Slide 19: 存储脚本与生成代码 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">存储脚本与生成代码</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">你能给 Claude 的最强大的工具之一就是代码</p>
+        <div class="fragment slide-left" style="transition-delay: 150ms; font-size: 0.85em; margin-bottom: 1.5em;">给 Claude 提供脚本和库，让它把精力花在组合编排上——决定下一步做什么，而不是重新构造样板代码。</div>
+        <div class="pattern-card fragment slide-left" style="transition-delay: 250ms;"><div class="pattern-name"><i class="fas fa-chart-line"></i> 数据科学 Skill 范例</div><div class="pattern-desc">提供从事件源获取数据的函数库 + 辅助函数，Claude 即时生成脚本组合这些功能，完成「周二发生了什么？」这类高级分析</div></div>
+        <div class="tag fragment slide-left" style="transition-delay: 350ms; margin-top: 1.5em;"><i class="fas fa-cubes"></i> 封装复用逻辑，让 Claude 专注决策而非编码</div>
+      </section>
+
+      <!-- Slide 20: 按需钩子 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">按需钩子</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1.5em;">Skills 可以包含只在当前 Skill 被调用时才激活的钩子，在整个会话期间保持生效</p>
+        <div class="two-col" style="margin-top: 1em;">
+          <div class="pattern-card fragment slide-left" style="transition-delay: 150ms;"><div class="pattern-name">/careful</div><div class="pattern-desc">通过 PreToolUse 匹配器拦截危险操作：rm -rf · DROP TABLE · force-push · kubectl delete</div></div>
+          <div class="pattern-card fragment slide-left" style="transition-delay: 250ms;"><div class="pattern-name">/freeze</div><div class="pattern-desc">阻止对特定目录之外的任何 Edit/Write 操作</div></div>
+        </div>
+        <div class="tag accent fragment slide-left" style="transition-delay: 350ms; margin-top: 1em;"><i class="fas fa-info-circle"></i> 适合场景：主观判断——你不想一直运行，但有时候极其有用</div>
+        <div class="fragment slide-left" style="transition-delay: 450ms; margin-top: 1em; font-size: 0.8em; color: var(--text-muted);"><strong>Claude 钩子类型：</strong>PreToolUse · PostToolUse · Stop · SessionStart</div>
+      </section>
+
+      <!-- Slide 21: 快速构建方式 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">快速构建方式</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">触发时机：创建 skill、优化 skill、运行 evals 测试</p>
+        <div class="flow-row fragment slide-left" style="transition-delay: 150ms; justify-content: center;">
+          <span class="tag primary"><i class="fas fa-wand"></i> /skill-creator</span>
+          <span style="color: var(--text-dim);">— 从零创建新 skill、迭代优化、运行 evals 测试</span>
+        </div>
+        <div class="flow-row fragment slide-left" style="transition-delay: 200ms; justify-content: center; margin-top: 0.8em;">
+          <span class="tag primary"><i class="fas fa-wand"></i> /skill-development</span>
+          <span style="color: var(--text-dim);">— 插件内 skill、钩子开发、目录结构验证</span>
+        </div>
+        <div style="margin-top: 1.5em;">
+          <div class="chapter-label fragment slide-left" style="transition-delay: 250ms;">构建流程：</div>
+          <ul style="font-size: 0.85em; margin-top: 0.5em;">
+            <li class="fragment slide-left" style="transition-delay: 300ms;">引导用户澄清目标 — skill 要做什么？何时触发？期望输出格式？</li>
+            <li class="fragment slide-left" style="transition-delay: 350ms;">系统化收集需求 — 边缘情况、输入输出格式、示例文件、成功标准</li>
+            <li class="fragment slide-left" style="transition-delay: 400ms;">生成 SKILL.md — name · description · compatibility · 正文</li>
+            <li class="fragment slide-left" style="transition-delay: 450ms;">生成测试用例 — 为客观可验证输出的 skill 创建 evals</li>
+            <li class="fragment slide-left" style="transition-delay: 500ms;">追踪优化效果 — 用 eval-viewer 持续改进 skill 质量</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Slide 22: 章节 III：实战案例 -->
+      <section class="title-slide layout-breathing" data-background="var(--bg)">
+        <div class="chapter-label fragment scale-up" style="transition-delay: 50ms;">CHAPTER III</div>
+        <h1 class="fragment slide-left" style="transition-delay: 150ms; font-size: 2.2em;">实战案例</h1>
+        <p class="subtitle fragment slide-left" style="transition-delay: 250ms;">test-assistant — 需求联动助手</p>
+        <p class="fragment slide-left" style="transition-delay: 350ms; font-size: 0.85em; color: var(--text-dim); margin-top: 1em;"><i class="fas fa-layer-group"></i> 混合模式：Pipeline + Tool Wrapper + Reviewer</p>
+      </section>
+
+      <!-- Slide 23: test-assistant 是什么 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">test-assistant 是什么</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--accent); font-size: 1em; margin-bottom: 1em;"><i class="fas fa-bullseye"></i> 核心价值：基于需求 ID，聚合多源信息，生成结构化测试分析文档</p>
+        <div class="metrics" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
+          <div class="metric-card fragment scale-up" style="transition-delay: 150ms;"><div class="icon"><i class="fas fa-folder"></i></div><div class="title">Dima</div><div class="desc">需求详情</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 200ms;"><div class="icon"><i class="fab fa-youtube"></i></div><div class="title">语雀</div><div class="desc">设计文档</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 250ms;"><div class="icon"><i class="fas fa-code-branch"></i></div><div class="title">Git</div><div class="desc">提交记录</div></div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 300ms;"><div class="icon"><i class="fas fa-clipboard-check"></i></div><div class="title">评审</div><div class="desc">评审记录</div></div>
+        </div>
+        <div class="fragment slide-left" style="transition-delay: 400ms; margin-top: 1.5em; padding: 1em; background: var(--bg-subtle); border: 1px solid var(--grid-line); border-radius: 4px;">
+          <div style="font-size: 0.85em; color: var(--text-muted);"><i class="fas fa-lightbulb" style="color: var(--warning);"></i><span style="margin-left: 0.5em;">所有结论必须追溯到 config.json 配置的来源，无证据标注"待查证"</span></div>
+        </div>
+      </section>
+
+      <!-- Slide 24: 四大核心指令 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">四大核心指令</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.9em; margin-bottom: 1em;">每个指令职责单一，Pipeline 模式强制顺序执行</p>
+        <div class="flow-row fragment slide-left" style="transition-delay: 150ms; justify-content: center; gap: 1em;">
+          <div class="flow-step active"><i class="fas fa-cog"></i> init</div><span class="flow-arrow">→</span>
+          <div class="flow-step"><i class="fas fa-download"></i> ingest</div><span class="flow-arrow">→</span>
+          <div class="flow-step"><i class="fas fa-sync"></i> refetch</div><span class="flow-arrow">→</span>
+          <div class="flow-step"><i class="fas fa-search"></i> analyze</div>
+        </div>
+        <div class="two-col fragment slide-left" style="transition-delay: 300ms; margin-top: 1.5em;">
+          <div>
+            <div class="tag primary" style="margin-bottom: 0.8em;"><i class="fas fa-cog"></i> init</div>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle icon"></i> 初始化工作区</li>
+              <li><i class="fas fa-check-circle icon"></i> 配置检查校验</li>
+              <li><i class="fas fa-check-circle icon"></i> MCP 就绪检测</li>
+            </ul>
+          </div>
+          <div>
+            <div class="tag accent" style="margin-bottom: 0.8em;"><i class="fas fa-search"></i> analyze</div>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle icon" style="color: var(--accent);"></i> 双视角评估</li>
+              <li><i class="fas fa-check-circle icon" style="color: var(--accent);"></i> 生成测试分析</li>
+              <li><i class="fas fa-check-circle icon" style="color: var(--accent);"></i> Review 强制关卡</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 25: init 流程 - 6步强制顺序 -->
+      <section class="layout-tight" data-background="var(--bg)">
+        <h2 class="fragment slide-left"><span class="tag primary" style="margin-right: 0.5em;">Pipeline</span>init 流程：6 步强制顺序</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.85em; margin-bottom: 0.8em;">⛔ 阻断式设计：上一步未完成，下一步不执行</p>
+        <div class="flow-row fragment slide-left" style="transition-delay: 150ms; flex-wrap: wrap; gap: 0.5em;">
+          <div class="flow-step" style="flex: 1 1 30%;">1. 检查 CLAUDE.md</div>
+          <div class="flow-step" style="flex: 1 1 30%;">2. validate-config</div>
+          <div class="flow-step" style="flex: 1 1 30%;">3. check-mcps</div>
+          <div class="flow-step" style="flex: 1 1 30%;">4. rag-status</div>
+          <div class="flow-step" style="flex: 1 1 30%;">5. 引导填配置</div>
+          <div class="flow-step active" style="flex: 1 1 30%;">6. 生成概览</div>
+        </div>
+        <div class="fragment slide-left" style="transition-delay: 300ms; margin-top: 1em; font-size: 0.8em;">
+          <div style="color: var(--text-dim); margin-bottom: 0.5em;">关键校验脚本：</div>
+          <div style="display: flex; gap: 0.5em; flex-wrap: wrap;">
+            <span class="tag">validate-config.sh</span><span class="tag">check-mcps.sh</span><span class="tag">rag-status.sh</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 26: ingest + analyze 核心机制 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left"><span class="tag accent" style="margin-right: 0.5em;">Tool Wrapper</span>数据采集 + 分析生成</h2>
+        <div class="two-col fragment slide-left" style="transition-delay: 150ms; gap: 2em;">
+          <div>
+            <div class="chapter-label" style="margin-bottom: 0.8em;"><i class="fas fa-download"></i> ingest 流程</div>
+            <div style="font-size: 0.85em;">
+              <div style="margin-bottom: 0.5em; color: var(--text-muted);">多源数据拉取</div>
+              <ul class="feature-list">
+                <li><i class="fas fa-link icon" style="color: var(--accent);"></i> Dima URL → 提取 openWorkItemId</li>
+                <li><i class="fas fa-image icon" style="color: var(--accent);"></i> 语雀 → 正文 + 图片解析</li>
+                <li><i class="fas fa-code icon" style="color: var(--accent);"></i> Git 提交 → 变更分析</li>
+                <li><i class="fas fa-comments icon" style="color: var(--accent);"></i> 评审 → 缺陷定性</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="chapter-label" style="margin-bottom: 0.8em;"><i class="fas fa-search"></i> analyze 流程</div>
+            <div style="font-size: 0.85em;">
+              <div style="margin-bottom: 0.5em; color: var(--text-muted);">双视角评估</div>
+              <ul class="feature-list">
+                <li><i class="fas fa-user icon" style="color: var(--primary-light);"></i> Feature-Anchor：用户旅程</li>
+                <li><i class="fas fa-code-branch icon" style="color: var(--primary-light);"></i> Change-Anchor：代码路径</li>
+                <li><i class="fas fa-compress-alt icon" style="color: var(--primary-light);"></i> Duality-Merge：合并去重</li>
+                <li><i class="fas fa-shield-alt icon" style="color: var(--primary-light);"></i> Review：强制关卡</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 27: 校验脚本体系 - Reviewer 模式 -->
+      <section class="layout-tight" data-background="var(--bg)">
+        <h2 class="fragment slide-left"><span class="tag accent" style="margin-right: 0.5em;">Reviewer</span>校验脚本体系</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.85em; margin-bottom: 0.8em;">检查标准外置，换一套 checklist 立刻变成另一种评审</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1em; margin-top: 1em;">
+          <div class="metric-card fragment scale-up" style="transition-delay: 150ms; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.5em;"><i class="fas fa-file-code" style="color: var(--accent);"></i><span class="tag">validate-config.sh</span></div>
+            <div style="font-size: 0.75em; color: var(--text-muted);">检测占位字符串 ("kb-xxxxx")</div>
+            <div style="font-size: 0.7em; color: var(--text-dim); margin-top: 0.3em;">init Step 2</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 200ms; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.5em;"><i class="fas fa-server" style="color: var(--accent);"></i><span class="tag">check-mcps.sh</span></div>
+            <div style="font-size: 0.75em; color: var(--text-muted);">MCP 可用性检测</div>
+            <div style="font-size: 0.7em; color: var(--text-dim); margin-top: 0.3em;">init Step 3</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 250ms; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.5em;"><i class="fas fa-brain" style="color: var(--accent);"></i><span class="tag">rag-status.sh</span></div>
+            <div style="font-size: 0.75em; color: var(--text-muted);">Serena 索引状态</div>
+            <div style="font-size: 0.7em; color: var(--text-dim); margin-top: 0.3em;">init Step 4</div>
+          </div>
+          <div class="metric-card fragment scale-up" style="transition-delay: 300ms; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.5em;"><i class="fas fa-clipboard-check" style="color: var(--accent);"></i><span class="tag">validate-test-analysis.sh</span></div>
+            <div style="font-size: 0.75em; color: var(--text-muted);">测试分析文档完整性</div>
+            <div style="font-size: 0.7em; color: var(--text-dim); margin-top: 0.3em;">analyze Step 7</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 28: Superpowers 联动 -->
+      <section class="layout-tight" data-background="var(--bg)">
+        <h2 class="fragment slide-left"><span class="tag primary" style="margin-right: 0.5em;">⚡</span>Superpowers 强制触发</h2>
+        <p class="fragment slide-left" style="transition-delay: 100ms; color: var(--text-muted); font-size: 0.85em; margin-bottom: 0.8em;">特定场景自动调用对应技能（bundled skills）</p>
+        <div style="font-size: 0.75em;">
+          <div class="flow-row fragment slide-left" style="transition-delay: 150ms; margin-bottom: 0.5em; background: var(--bg-subtle); padding: 0.5em; border-radius: 4px;">
+            <span style="color: var(--accent); min-width: 120px;">3+ 模块变更</span><span class="flow-arrow">→</span><span class="tag" style="margin: 0;">brainstorming</span><span style="color: var(--text-dim); margin-left: 0.5em;">Step 3 前</span>
+          </div>
+          <div class="flow-row fragment slide-left" style="transition-delay: 200ms; margin-bottom: 0.5em; background: var(--bg-subtle); padding: 0.5em; border-radius: 4px;">
+            <span style="color: var(--accent); min-width: 120px;">多线并行</span><span class="flow-arrow">→</span><span class="tag" style="margin: 0;">dispatching-parallel-agents</span><span style="color: var(--text-dim); margin-left: 0.5em;">Step 5 前</span>
+          </div>
+          <div class="flow-row fragment slide-left" style="transition-delay: 250ms; margin-bottom: 0.5em; background: var(--bg-subtle); padding: 0.5em; border-radius: 4px;">
+            <span style="color: var(--accent); min-width: 120px;">完成前验证</span><span class="flow-arrow">→</span><span class="tag" style="margin: 0;">verification-before-completion</span><span style="color: var(--text-dim); margin-left: 0.5em;">Step 7 前</span>
+          </div>
+          <div class="flow-row fragment slide-left" style="transition-delay: 300ms; margin-bottom: 0.5em; background: var(--bg-subtle); padding: 0.5em; border-radius: 4px;">
+            <span style="color: var(--accent); min-width: 120px;">有审查流程</span><span class="flow-arrow">→</span><span class="tag" style="margin: 0;">requesting-code-review</span><span style="color: var(--text-dim); margin-left: 0.5em;">Step 7 前</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 29: 案例设计原则总结 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">test-assistant 设计原则</h2>
+        <div class="summary-points fragment slide-left" style="transition-delay: 100ms; margin-top: 1.5em;">
+          <div class="summary-point"><div class="num" style="color: var(--accent);">1</div><div class="text">来源优先 — 所有结论必须追溯到 config.json 配置的来源</div></div>
+          <div class="summary-point"><div class="num" style="color: var(--accent);">2</div><div class="text">证据说话 — 无证据的结论标注"待查证"</div></div>
+          <div class="summary-point"><div class="num" style="color: var(--accent);">3</div><div class="text">步骤强检 — analyze 步骤必须按序执行，Review 是强制关卡</div></div>
+          <div class="summary-point"><div class="num" style="color: var(--accent);">4</div><div class="text">模式组合 — Pipeline + Tool Wrapper + Reviewer 协同</div></div>
+        </div>
+        <div class="fragment slide-left" style="transition-delay: 350ms; margin-top: 1.5em; text-align: center;">
+          <div class="tag primary" style="font-size: 0.9em; padding: 0.8em 1.5em;"><i class="fas fa-lightbulb"></i> 设计模式不是孤立的，可以自由组合</div>
+        </div>
+      </section>
+
+      <!-- Slide 30: Skill 设计要点 -->
+      <section data-background="var(--bg)">
+        <h2 class="fragment slide-left">Skill 设计要点</h2>
+        <div class="summary-points" style="margin-top: 1.5em;">
+          <div class="summary-point fragment scale-up" style="transition-delay: 100ms;"><div class="num">1</div><div class="text" style="color: var(--primary-light);">渐进式披露</div></div>
+          <div class="summary-point fragment scale-up" style="transition-delay: 150ms;"><div class="num">2</div><div class="text" style="color: var(--primary-light);">结构化模式</div></div>
+          <div class="summary-point fragment scale-up" style="transition-delay: 200ms;"><div class="num">3</div><div class="text" style="color: var(--primary-light);">踩坑点积累</div></div>
+          <div class="summary-point fragment scale-up" style="transition-delay: 250ms;"><div class="num">4</div><div class="text" style="color: var(--primary-light);">不断迭代</div></div>
+        </div>
+        <div class="fragment slide-left" style="transition-delay: 350ms; margin-top: 2em; text-align: center;">
+          <div class="tag primary" style="font-size: 1em; padding: 1em 2em;"><i class="fas fa-rocket"></i> 好的 Skill 来自持续的打磨</div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1280,
+      height: 720,
+      margin: 0.04,
+      minScale: 0.8,
+      maxScale: 1.2,
+      hash: true,
+      slideNumber: 'c/t',
+      progress: true,
+      center: false,
+      controls: true,
+      controlsTutorial: false,
+      transition: 'slide',
+      transitionSpeed: 'fast',
+      backgroundTransition: 'fade',
+    }).then(() => { hljs.highlightAll(); });
+  </script>
+</body>
+</html>
