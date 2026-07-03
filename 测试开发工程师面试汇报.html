@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试开发工程师 · 面试汇报</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&family=Archivo+Narrow:wght@500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Tokens ─────────────────────────────────────── */
+    :root {
+      --c-bg: #ebe6dc;
+      --c-bg-paper: #f3eee2;
+      --c-fg: #14130f;
+      --c-fg-2: rgba(20, 19, 15, 0.62);
+      --c-fg-3: rgba(20, 19, 15, 0.30);
+      --c-accent: #b03a1a;
+      --c-blue: #2d4d6e;
+      --c-border: rgba(20, 19, 15, 0.40);
+      --c-rule: rgba(20, 19, 15, 0.18);
+
+      --f-display: "Archivo", "Noto Sans SC", system-ui, sans-serif;
+      --f-narrow: "Archivo Narrow", "Archivo", "Noto Sans SC", sans-serif;
+      --f-body: "Archivo", "Noto Sans SC", system-ui, sans-serif;
+      --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Menlo", monospace;
+      --bg: var(--c-bg); --text: var(--c-fg); --text-muted: var(--c-fg-2);
+      --text-subtle: var(--c-fg-3); --accent: var(--c-accent); --divider: var(--c-border);
+      --font-display: var(--f-display); --font-body: var(--f-body); --font-mono: var(--f-mono);
+    }
+
+    /* ── Base ───────────────────────────────────────── */
+    .reveal { font-family: var(--f-body); font-size: 28px; color: var(--c-fg); background: var(--c-bg); }
+    .reveal .slides { text-align: left; }
+    .reveal section {
+      padding: 40px 56px; height: 100%; box-sizing: border-box; overflow: hidden;
+      background: var(--c-bg); position: relative;
+    }
+    .reveal .slides > section.deck-flex.present { display: flex !important; top: 0 !important; }
+    .reveal .slides > section.deck-grid.present { display: grid !important; top: 0 !important; }
+    .reveal section > * { max-width: 100%; box-sizing: border-box; }
+    h1, h2, h3, h4 { word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; line-break: strict; }
+    p, li, span, div { word-break: normal; overflow-wrap: anywhere; }
+    img, svg, video { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .reveal svg text { stroke: none; paint-order: fill; }
+
+    /* ── Type ───────────────────────────────────────── */
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: var(--f-display); line-height: 1.05; letter-spacing: 0; color: var(--c-fg);
+    }
+    .reveal h1 { font-size: 3em; font-weight: 600; margin: 0; }
+    .reveal h2 { font-size: 1.7em; font-weight: 500; margin: 0 0 0.4em 0; }
+    .reveal h3 { font-size: 0.95em; font-weight: 600; margin: 0; font-family: var(--f-narrow); text-transform: uppercase; letter-spacing: 0.04em; }
+    .reveal h4 { font-family: var(--f-narrow); font-size: 0.55em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--c-fg-3); margin: 0; }
+    .reveal p  { font-family: var(--f-body); font-size: 0.78em; line-height: 1.55; color: var(--c-fg-2); margin: 0; font-weight: 300; }
+
+    .kicker {
+      font-family: var(--f-mono); font-size: 0.5em;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-fg-2);
+    }
+    .nbr { white-space: nowrap; }  /* G11: 孤标点/数字单位绑定前词,防 widow punctuation */
+
+    .pin {
+      position: absolute; left: 56px; bottom: 26px;
+      font-family: var(--f-mono); font-size: 0.46em;
+      color: var(--c-fg-3); letter-spacing: 0.06em;
+      z-index: 10;
+    }
+    .spatial-cover .pin { bottom: 180px; left: 56px; }
+    .void-page .pin { display: none; }
+
+    /* ── Sheet border ── */
+    .sheet-frame {
+      position: absolute; top: 20px; right: 20px; bottom: 20px; left: 20px;
+      border: 1.5px solid var(--c-fg);
+      pointer-events: none;
+    }
+    .sheet-frame::before, .sheet-frame::after {
+      content: ''; position: absolute; background: var(--c-fg);
+    }
+    .sheet-frame::before { top: -1.5px; left: -1.5px; width: 14px; height: 1.5px; }
+    .sheet-frame::after  { top: -1.5px; left: -1.5px; width: 1.5px; height: 14px; }
+
+    /* ── North mark ── */
+    .north-mark { position: absolute; top: 36px; right: 36px; width: 56px; height: 56px; z-index: 5; }
+    .north-mark svg { width: 100%; height: 100%; }
+    .north-mark .n {
+      position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+      font-family: var(--f-narrow); font-size: 13px; font-weight: 700;
+      color: var(--c-fg); background: var(--c-bg); padding: 0 4px;
+    }
+
+    /* ─────────── SPATIAL COVER ─────────── */
+    .spatial-cover { padding: 40px 56px; }
+    .spatial-cover .drawing-sheet {
+      position: absolute; top: 36px; right: 36px; bottom: 36px; left: 36px;
+      display: grid; grid-template-rows: 1fr 112px;
+    }
+    .spatial-cover .blueprint-sheet {
+      position: relative; background: var(--c-bg-paper);
+      background-image:
+        linear-gradient(var(--c-rule) 1px, transparent 1px),
+        linear-gradient(90deg, var(--c-rule) 1px, transparent 1px);
+      background-size: 24px 24px;
+      border: 1px solid var(--c-border); overflow: hidden;
+    }
+    .spatial-cover .blueprint-sheet .north-mark { top: 16px; right: 16px; }
+    .spatial-cover .plan-drawing { position: absolute; top: 96px; left: 96px; width: 600px; height: 360px; }
+    .spatial-cover .plan-drawing svg { width: 100%; height: 100%; }
+    .spatial-cover .dimension-chain {
+      position: absolute; top: 56px; left: 116px; width: 560px; height: 28px;
+      display: flex; align-items: center; overflow: hidden;
+      font-family: var(--f-narrow); font-size: 0.42em; color: var(--c-fg); letter-spacing: 0.04em;
+    }
+    .spatial-cover .dimension-chain .dim {
+      flex: 1; height: 100%; border-left: 1px solid var(--c-fg); border-right: 1px solid var(--c-fg);
+      position: relative; text-align: center; padding-top: 6px; box-sizing: border-box;
+    }
+    .spatial-cover .dimension-chain .dim::before {
+      content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--c-fg);
+    }
+    .spatial-cover .dimension-chain .dim span {
+      position: relative; background: var(--c-bg-paper); padding: 0 6px;
+    }
+    .spatial-cover .plate-notes {
+      position: absolute; top: 96px; right: 56px; width: 260px;
+      font-family: var(--f-mono); font-size: 0.46em; line-height: 1.6; color: var(--c-fg-2);
+    }
+    .spatial-cover .plate-notes h4 {
+      font-family: var(--f-narrow); font-size: 0.6em; color: var(--c-fg);
+      margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--c-fg);
+    }
+    .spatial-cover .plate-notes .note {
+      display: grid; grid-template-columns: 24px 1fr; gap: 8px; padding: 6px 0;
+      border-bottom: 1px dashed var(--c-rule);
+    }
+    .spatial-cover .plate-notes .note b { color: var(--c-accent); font-family: var(--f-mono); font-weight: 700; }
+    .spatial-cover .cover-bottom {
+      position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 0; min-height: 112px; background: var(--c-bg-paper);
+      border: 1px solid var(--c-fg); border-top: none;
+    }
+    .spatial-cover .cover-title-area {
+      padding: 14px 22px 10px 22px; background: var(--c-bg-paper);
+      border-right: 1.5px solid var(--c-fg);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .spatial-cover .cover-title-area h1 { font-size: 1.18em; line-height: 0.98; }
+    .spatial-cover .cover-title-area h1 em { color: var(--c-accent); font-style: normal; }
+    .spatial-cover .cover-title-area .sub {
+      display: flex; gap: 1.6em; align-items: baseline;
+      font-family: var(--f-narrow); font-size: 0.42em;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-fg-2);
+    }
+    .spatial-cover .cover-title-area .sub b { color: var(--c-fg); font-weight: 600; }
+    .spatial-cover .title-block-static {
+      width: 100%; align-self: stretch; box-sizing: border-box;
+      display: grid; grid-template-columns: 1fr 1fr 74px; grid-template-rows: 30px 1fr 1fr;
+      border: none; background: var(--c-bg-paper);
+      font-family: var(--f-narrow); font-size: 0.34em; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .spatial-cover .title-block-static .cell {
+      padding: 6px 10px; border-right: 1px solid var(--c-fg); border-bottom: 1px solid var(--c-fg);
+      min-width: 0; color: var(--c-fg-3); line-height: 1.3;
+    }
+    .spatial-cover .title-block-static .cell.head { background: var(--c-fg); color: var(--c-bg); font-weight: 600; }
+    .spatial-cover .title-block-static .cell .v { color: var(--c-fg); font-size: 1.2em; display: block; margin-top: 2px; letter-spacing: 0; font-weight: 500; text-transform: none; }
+    .spatial-cover .title-block-static .scale {
+      grid-column: 3; grid-row: 1 / 4; border: none; border-left: 1px solid var(--c-fg);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--f-display); font-size: 1.7em; color: var(--c-fg); font-weight: 600; letter-spacing: 0; text-transform: none;
+    }
+
+    /* ─────────── SECTION CUT (proof) ─────────── */
+    .section-cut { padding: 56px 56px 90px 56px; grid-template-columns: 1.05fr 1.55fr; gap: 36px; }
+    .section-cut .meta { display: flex; flex-direction: column; gap: 0.7em; padding-right: 12px; }
+    .section-cut .meta h2 { font-size: 1.62em; margin-top: 0.3em; }
+    .section-cut .meta .lede { font-size: 0.74em; line-height: 1.55; color: var(--c-fg-2); margin-top: 0.5em; }
+    .section-cut .meta .legend { margin-top: 1.2em; display: flex; flex-direction: column; gap: 0.5em;
+      font-family: var(--f-narrow); font-size: 0.5em; text-transform: uppercase; letter-spacing: 0.04em; }
+    .section-cut .meta .legend div { display: flex; align-items: center; gap: 0.8em; }
+    .section-cut .meta .legend .sw { width: 24px; height: 4px; flex-shrink: 0; }
+    .section-cut .meta .legend .sw.fill { background: var(--c-fg); }
+    .section-cut .meta .legend .sw.cut { background: var(--c-accent); }
+    .section-cut .meta .legend .sw.dash { border-top: 1.5px dashed var(--c-fg); height: 0; }
+    .section-cut .meta .source { margin-top: 1.2em; padding-top: 0.7em; border-top: 1px solid var(--c-rule);
+      font-family: var(--f-mono); font-size: 0.42em; color: var(--c-fg-3); letter-spacing: 0.04em; }
+    .section-cut .drawing {
+      background: var(--c-bg-paper);
+      background-image:
+        linear-gradient(var(--c-rule) 1px, transparent 1px),
+        linear-gradient(90deg, var(--c-rule) 1px, transparent 1px);
+      background-size: 24px 24px;
+      border: 1px solid var(--c-border); padding: 22px; position: relative;
+      align-self: stretch; min-height: 440px;
+    }
+    .section-cut .drawing svg { width: 100%; height: 100%; }
+    .section-cut .drawing svg .svg-label {
+      font-family: var(--f-narrow); font-size: 14px; font-weight: 700;
+      letter-spacing: 0.06em; text-anchor: middle;
+    }
+    .section-cut .drawing svg .callout {
+      font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.04em;
+    }
+
+    /* ─────────── CUTAWAY (multi-layer) ─────────── */
+    .cutaway { padding: 56px 56px 90px 56px; grid-template-rows: auto 1fr; gap: 18px; }
+    .cutaway .head h2 { font-size: 1.62em; margin-top: 0.3em; }
+    .cutaway .head .lede { font-size: 0.74em; line-height: 1.5; color: var(--c-fg-2); margin-top: 0.4em; max-width: 880px; }
+    .cutaway .stack { display: flex; flex-direction: column; gap: 10px; }
+    .cutaway .layer {
+      display: grid; grid-template-columns: 64px 1.1fr 2.3fr 96px;
+      gap: 18px; align-items: center;
+      padding: 12px 18px; background: var(--c-bg-paper); border: 1px solid var(--c-fg);
+    }
+    .cutaway .layer .id {
+      font-family: var(--f-narrow); font-size: 0.7em; font-weight: 700; color: var(--c-accent); letter-spacing: 0.05em;
+    }
+    .cutaway .layer h3 { font-size: 0.82em; }
+    .cutaway .layer p { font-size: 0.64em; line-height: 1.4; }
+    .cutaway .layer .gauge {
+      font-family: var(--f-mono); font-size: 0.5em; color: var(--c-fg-2); text-align: right; letter-spacing: 0.04em; line-height: 1.3;
+    }
+    .cutaway .layer .gauge b { color: var(--c-accent); font-size: 1.5em; font-weight: 700; display: block; }
+    .cutaway .layer.featured { background: var(--c-fg); color: var(--c-bg); border-color: var(--c-fg); }
+    .cutaway .layer.featured h3, .cutaway .layer.featured .gauge { color: var(--c-bg); }
+    .cutaway .layer.featured p { color: rgba(235, 230, 220, 0.78); }
+    .cutaway .layer.featured .id { color: var(--c-bg); }
+    .cutaway .layer.featured .gauge b { color: var(--c-accent); }
+
+    /* ─────────── MATRIX ─────────── */
+    .matrix { padding: 56px 56px 80px 56px; grid-template-rows: auto 1fr; gap: 16px; }
+    .matrix .head h2 { font-size: 1.62em; margin-top: 0.3em; }
+    .matrix .head .lede { font-size: 0.74em; line-height: 1.5; color: var(--c-fg-2); margin-top: 0.4em; max-width: 800px; }
+    .matrix-grid {
+      display: grid; align-self: start;
+      border: 1.5px solid var(--c-fg); background: var(--c-bg-paper);
+    }
+    .matrix-grid.cols-3 { grid-template-columns: 200px 1fr 1fr; }
+    .matrix-grid.cols-5 { grid-template-columns: 140px repeat(5, 1fr); }
+    .matrix-grid.cols-6 { grid-template-columns: 130px repeat(5, 1fr); }
+    .matrix-grid .mh {
+      padding: 10px 12px;
+      font-family: var(--f-narrow); font-size: 0.44em;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-fg-3);
+      border-bottom: 1.5px solid var(--c-fg); border-right: 1px solid var(--c-fg);
+    }
+    .matrix-grid .mh:last-child { border-right: none; }
+    .matrix-grid .mh.corner { background: var(--c-fg); color: var(--c-bg); }
+    .matrix-grid .row-label {
+      padding: 11px 12px;
+      font-family: var(--f-narrow); font-size: 0.56em; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.03em; color: var(--c-fg);
+      border-right: 1px solid var(--c-fg); border-bottom: 1px solid var(--c-rule);
+      display: flex; align-items: center;
+    }
+    .matrix-grid .cell {
+      padding: 12px 14px; border-right: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule);
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .matrix-grid .cell:last-child { border-right: none; }
+    .matrix-grid .cell .step {
+      font-family: var(--f-mono); font-size: 0.62em; font-weight: 700; color: var(--c-accent); letter-spacing: 0.04em;
+    }
+    .matrix-grid .cell .desc {
+      font-family: var(--f-body); font-size: 0.54em; color: var(--c-fg); line-height: 1.35; font-weight: 400;
+    }
+    .matrix-grid .cell .out {
+      font-family: var(--f-mono); font-size: 0.46em; color: var(--c-fg-2); line-height: 1.3; letter-spacing: 0.02em;
+    }
+    .matrix-grid .cell.fill { background: rgba(176, 58, 26, 0.08); }
+    .matrix-grid .cell.head-cell { background: var(--c-fg); color: var(--c-bg); }
+    .matrix-grid .cell.head-cell .desc { color: var(--c-bg); font-weight: 600; }
+    .matrix-grid .row-label:last-of-type, .matrix-grid .tr-last { border-bottom: none; }
+
+    /* ─────────── ROUTE (path drawing) ─────────── */
+    .route { padding: 56px 56px 90px 56px; grid-template-rows: auto 1fr; gap: 18px; }
+    .route .head h2 { font-size: 1.62em; margin-top: 0.3em; max-width: calc(100% - 120px); }
+    .route .head .lede { font-size: 0.74em; line-height: 1.5; color: var(--c-fg-2); margin-top: 0.4em; max-width: 880px; }
+    .route-board {
+      background: var(--c-bg-paper);
+      background-image:
+        linear-gradient(var(--c-rule) 1px, transparent 1px),
+        linear-gradient(90deg, var(--c-rule) 1px, transparent 1px);
+      background-size: 24px 24px;
+      border: 1px solid var(--c-border);
+      padding: 40px 32px 30px; position: relative; min-height: 320px;
+    }
+    .route-stops { display: grid; gap: 0; position: relative; z-index: 2; }
+    .route-stops.c5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .route-stops.c6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .route-stop { text-align: center; padding: 34px 8px 0; position: relative; }
+    .route-stop::before {
+      content: ''; position: absolute; top: 0; left: 50%;
+      width: 14px; height: 14px; background: var(--c-bg-paper);
+      border: 2px solid var(--c-fg); transform: translateX(-50%) rotate(45deg);
+    }
+    .route-stop.active::before { background: var(--c-accent); border-color: var(--c-accent); }
+    .route-stop .num {
+      display: inline-block; margin-bottom: 4px; background: var(--c-bg-paper); padding: 0 6px;
+      font-family: var(--f-narrow); font-size: 0.46em; color: var(--c-fg-3);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .route-stop h3 {
+      font-size: 0.66em; margin: 4px 0 6px 0;
+      font-family: var(--f-display); text-transform: none; letter-spacing: 0; line-height: 1.08;
+    }
+    .route-stop p { font-size: 0.5em; line-height: 1.3; color: var(--c-fg-2); padding: 0 4px; }
+    .route-stop .path-note {
+      display: block; margin-top: 8px;
+      font-family: var(--f-mono); font-size: 0.66em; letter-spacing: 0.04em; color: var(--c-accent);
+    }
+    .route-arc {
+      width: 100%; height: 100%; position: absolute; inset: 0; padding: 44px 36px 36px;
+      box-sizing: border-box; pointer-events: none;
+    }
+
+    /* ─────────── VOID PAGE (close / manifesto) ─────────── */
+    .void-page { padding: 40px; align-items: end; justify-content: start; }
+    .void-page .void-frame {
+      width: 100%; height: 100%;
+      display: grid; grid-template-rows: 1fr auto;
+      padding: 24px 32px; gap: 16px;
+    }
+    .void-page .void-frame .void-body { align-self: center; max-width: 880px; }
+    .void-page .void-frame .void-body .kicker { margin-bottom: 1em; }
+    .void-page .void-frame .void-body h2 {
+      font-size: 2.4em; font-weight: 500; line-height: 1.04;
+      margin-bottom: 0.4em; letter-spacing: 0;
+    }
+    .void-page .void-frame .void-body h2 em { color: var(--c-accent); font-style: normal; }
+    .void-page .void-frame .void-body p {
+      font-size: 0.8em; line-height: 1.55; color: var(--c-fg-2); max-width: 760px;
+    }
+    .void-page .void-frame .void-foot {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      padding-top: 14px; border-top: 1.5px solid var(--c-fg);
+      font-family: var(--f-narrow); font-size: 0.42em;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-fg-2);
+    }
+    .void-page .void-frame .void-foot b {
+      display: block; color: var(--c-fg); font-size: 1.4em; font-weight: 600;
+      letter-spacing: 0; text-transform: none; margin-top: 4px;
+    }
+    .void-page .void-frame .void-foot div + div { padding-left: 18px; border-left: 1px solid var(--c-rule); }
+
+    /* ── VOID PAGE dark variant (manifesto 反相 · 深浅呼吸 · 图纸封套) ── */
+    .void-page.dark { background: var(--c-fg) !important; }
+    .void-page.dark .sheet-frame { border-color: rgba(235,230,220,0.30); }
+    .void-page.dark .sheet-frame::before, .void-page.dark .sheet-frame::after { background: rgba(235,230,220,0.55); }
+    .void-page.dark .void-frame .void-body .kicker { color: rgba(235,230,220,0.55); }
+    .void-page.dark .void-frame .void-body h2 { color: var(--c-bg); }
+    .void-page.dark .void-frame .void-body h2 em { color: #e8784c; font-style: normal; }
+    .void-page.dark .void-frame .void-body p { color: rgba(235,230,220,0.72); }
+    .void-page.dark .void-frame .void-foot { border-top-color: rgba(235,230,220,0.40); color: rgba(235,230,220,0.55); }
+    .void-page.dark .void-frame .void-foot b { color: var(--c-bg); }
+    .void-page.dark .void-frame .void-foot div + div { border-left-color: rgba(235,230,220,0.20); }
+
+    /* Progress / controls */
+    .reveal .progress { color: var(--c-accent); height: 2px; }
+    .reveal .controls { color: var(--c-fg-2); }
+    .reveal .fragment { transition-duration: 350ms; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal .fragment { opacity: 1; transform: none; transition: opacity 200ms ease-out; }
+    }
+
+    /* ── harness 防溢出兜底 ── */
+    .reveal section { overflow: hidden; }
+    .reveal section * { overflow-wrap: anywhere; }
+    .reveal table { table-layout: fixed; width: 100%; }
+    .reveal :focus-visible { outline: 3px solid var(--c-accent); outline-offset: 2px; border-radius: 2px; }
+    .reveal svg { max-width: 100%; box-sizing: border-box; }
+    .reveal .slides > section { overflow: hidden !important; }
+    html, body { overflow-x: hidden; }
+    .reveal .slides > section.spatial-cover { padding: 40px 56px !important; }
+    .reveal .slides > section.section-cut { padding: 56px 56px 90px 56px !important; grid-template-columns: 1.05fr 1.55fr; }
+    .reveal .slides > section.cutaway,
+    .reveal .slides > section.matrix,
+    .reveal .slides > section.route { padding: 56px 56px 90px 56px !important; }
+    .reveal .slides > section.void-page { padding: 40px !important; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ═══ 1 · COVER ═════════════════════════════════════════════ -->
+      <section class="spatial-cover deck-flex" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="drawing-sheet">
+          <div class="blueprint-sheet">
+            <div class="north-mark">
+              <span class="n">N</span>
+              <svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6">
+                <circle cx="30" cy="30" r="22"/>
+                <path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/>
+                <path d="M 30 52 L 36 30 L 30 34 L 24 30 Z" fill="var(--c-bg)"/>
+                <line x1="30" y1="4" x2="30" y2="14"/><line x1="30" y1="46" x2="30" y2="56"/>
+                <line x1="4" y1="30" x2="14" y2="30"/><line x1="46" y1="30" x2="56" y2="30"/>
+              </svg>
+            </div>
+
+            <div class="dimension-chain">
+              <div class="dim"><span class="nbr">9 yrs</span></div>
+              <div class="dim"><span class="nbr">4 yrs</span></div>
+              <div class="dim"><span class="nbr">3 链</span></div>
+              <div class="dim"><span class="nbr">17 plates</span></div>
+            </div>
+
+            <div class="plate-notes">
+              <h4>Plate notes · 三条证据链</h4>
+              <div class="note"><b>A1</b><span>UE 自动化框架 · 三端对象驱动</span></div>
+              <div class="note"><b>A2</b><span>客户端性能体系 · 大盘到温度</span></div>
+              <div class="note"><b>A3</b><span>AI 质量工程 · 用例助手 + Agent</span></div>
+              <div class="note"><b>A4</b><span>工程化能力 · 可复用可复测</span></div>
+            </div>
+
+            <div class="plan-drawing">
+              <svg viewBox="0 0 600 360" stroke="var(--c-fg)" fill="none" stroke-width="1.4">
+                <!-- 三个模块的"系统蓝图":自动化 / 性能 / AI -->
+                <rect x="20" y="20" width="560" height="320" stroke-width="3"/>
+                <!-- 模块分隔 -->
+                <line x1="210" y1="20" x2="210" y2="340"/>
+                <line x1="410" y1="20" x2="410" y2="340"/>
+                <!-- A1 自动化框架:层叠堆 -->
+                <rect x="48" y="60" width="130" height="36" fill="var(--c-fg)" opacity="0.06"/>
+                <rect x="48" y="104" width="130" height="36" fill="var(--c-fg)" opacity="0.06"/>
+                <rect x="48" y="148" width="130" height="36" fill="var(--c-accent)" opacity="0.18"/>
+                <rect x="48" y="192" width="130" height="36" fill="var(--c-fg)" opacity="0.06"/>
+                <rect x="48" y="236" width="130" height="36" fill="var(--c-fg)" opacity="0.06"/>
+                <line x1="48" y1="288" x2="178" y2="288" stroke-dasharray="3 3"/>
+                <circle cx="113" cy="300" r="9" fill="var(--c-accent)"/>
+                <text x="113" y="304" fill="white" font-family="monospace" font-size="10" text-anchor="middle" font-weight="700">1</text>
+                <!-- A2 性能:折线图 + 热力点 -->
+                <line x1="248" y1="280" x2="378" y2="280"/>
+                <polyline points="258,250 290,220 320,236 350,180 372,200" stroke="var(--c-accent)" stroke-width="2"/>
+                <circle cx="258" cy="250" r="3" fill="var(--c-fg)"/>
+                <circle cx="290" cy="220" r="3" fill="var(--c-fg)"/>
+                <circle cx="320" cy="236" r="3" fill="var(--c-fg)"/>
+                <circle cx="350" cy="180" r="4" fill="var(--c-accent)"/>
+                <circle cx="372" cy="200" r="3" fill="var(--c-fg)"/>
+                <!-- 热力网格 -->
+                <g opacity="0.5">
+                  <rect x="252" y="80" width="20" height="20" fill="var(--c-accent)" opacity="0.3"/>
+                  <rect x="272" y="80" width="20" height="20" fill="var(--c-accent)" opacity="0.6"/>
+                  <rect x="292" y="80" width="20" height="20" fill="var(--c-accent)" opacity="0.2"/>
+                  <rect x="252" y="100" width="20" height="20" fill="var(--c-accent)" opacity="0.5"/>
+                  <rect x="272" y="100" width="20" height="20" fill="var(--c-accent)" opacity="0.85"/>
+                  <rect x="292" y="100" width="20" height="20" fill="var(--c-accent)" opacity="0.4"/>
+                  <rect x="252" y="120" width="20" height="20" fill="var(--c-accent)" opacity="0.2"/>
+                  <rect x="272" y="120" width="20" height="20" fill="var(--c-accent)" opacity="0.45"/>
+                  <rect x="292" y="120" width="20" height="20" fill="var(--c-accent)" opacity="0.15"/>
+                </g>
+                <circle cx="313" cy="300" r="9" fill="var(--c-accent)"/>
+                <text x="313" y="304" fill="white" font-family="monospace" font-size="10" text-anchor="middle" font-weight="700">2</text>
+                <!-- A3 AI:节点图 -->
+                <circle cx="510" cy="90" r="14" fill="var(--c-fg)"/>
+                <circle cx="460" cy="160" r="11" fill="none" stroke="var(--c-fg)" stroke-width="1.5"/>
+                <circle cx="510" cy="200" r="11" fill="var(--c-accent)"/>
+                <circle cx="560" cy="160" r="11" fill="none" stroke="var(--c-fg)" stroke-width="1.5"/>
+                <circle cx="510" cy="260" r="14" fill="var(--c-fg)"/>
+                <line x1="510" y1="104" x2="460" y2="149"/>
+                <line x1="510" y1="104" x2="510" y2="189"/>
+                <line x1="510" y1="104" x2="560" y2="149"/>
+                <line x1="460" y1="171" x2="510" y2="246"/>
+                <line x1="510" y1="211" x2="510" y2="246"/>
+                <line x1="560" y1="171" x2="510" y2="246"/>
+                <circle cx="510" cy="300" r="9" fill="var(--c-accent)"/>
+                <text x="510" y="304" fill="white" font-family="monospace" font-size="10" text-anchor="middle" font-weight="700">3</text>
+                <!-- 标签 -->
+                <text x="113" y="48" fill="var(--c-fg)" font-family="var(--f-narrow)" font-size="13" text-anchor="middle" letter-spacing="0.06em">FRAMEWORK</text>
+                <text x="313" y="48" fill="var(--c-fg)" font-family="var(--f-narrow)" font-size="13" text-anchor="middle" letter-spacing="0.06em">PERFORMANCE</text>
+                <text x="510" y="48" fill="var(--c-fg)" font-family="var(--f-narrow)" font-size="13" text-anchor="middle" letter-spacing="0.06em">AI QUALITY</text>
+                <!-- 底部基线 -->
+                <line x1="20" y1="324" x2="580" y2="324" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="cover-bottom">
+            <div class="cover-title-area">
+              <span class="kicker">Plate A · candidate brief · 1 : 50</span>
+              <h1>测试开发工程师<br>· <em>质量工程</em> 面试汇报<span class="nbr">。</span></h1>
+              <div class="sub">
+                <span><b>岗位</b> 测试开发 · 前沿探索</span>
+                <span><b>日期</b> 2026.07</span>
+                <span><b>Sheet</b> A-01 / 17</span>
+              </div>
+            </div>
+            <div class="title-block-static">
+              <div class="cell head">Project</div>
+              <div class="cell head">Drawn</div>
+              <div class="scale">A-01</div>
+              <div class="cell">面试汇报<span class="v">质量工程</span></div>
+              <div class="cell">2026.07.03<span class="v">候选人</span></div>
+              <div class="cell">Drawing<span class="v">Portfolio</span></div>
+              <div class="cell">Sheet<span class="v">01 / 17</span></div>
+            </div>
+          </div>
+        </div>
+        <span class="pin" style="display:none;" data-qa-ignore="decorative">01 · cover · brief</span>
+      </section>
+
+      <!-- ═══ 2 · 自我介绍 (cutaway 变体) ═══════════════════════════ -->
+      <section class="cutaway deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate B · candidate profile · stack-up</span>
+          <h2>9 年测试开发,4 年在游戏项目把质量问题<span class="nbr">工程化</span>。</h2>
+          <p class="lede">不只是写自动化脚本,而是用测试开发、平台工具和 AI 技术提升游戏研发质量与效率 —— 这和前沿探索方向高度匹配。</p>
+        </div>
+        <div class="stack">
+          <div class="layer">
+            <span class="id">L 05</span>
+            <h3>年限锚点</h3>
+            <p>横跨传统测试执行到 AI 质量工程,从脚本到平台到智能体。</p>
+            <div class="gauge"><b class="nbr">9 yrs</b>测试开发</div>
+          </div>
+          <div class="layer">
+            <span class="id">L 04</span>
+            <h3>游戏测试开发</h3>
+            <p>引擎覆盖 Unity · UE4 · UE5;品类覆盖大世界、MOBA、休闲竞技。</p>
+            <div class="gauge"><b class="nbr">4 yrs</b>游戏专项</div>
+          </div>
+          <div class="layer featured">
+            <span class="id">L 03</span>
+            <h3>核心技术栈</h3>
+            <p>Python · C++ · Lua · TypeScript —— 自动化框架、测试工具、日志分析、性能采集、平台化。</p>
+            <div class="gauge stat"><b class="nbr">4 langs</b>工程主力</div>
+          </div>
+          <div class="layer">
+            <span class="id">L 02</span>
+            <h3>腾讯阶段</h3>
+            <p>GAutomator 自动化 · UE 自动化 · 客户端性能 · DS 压测 · 日志分析。</p>
+            <div class="gauge"><b>腾讯</b>质量基础设施</div>
+          </div>
+          <div class="layer">
+            <span class="id">L 01</span>
+            <h3>现在阶段</h3>
+            <p>AI 质量工程 —— LLM / RAG / Agent / Workflow 接入需求分析、用例生成、PR 风险、测试报告。</p>
+            <div class="gauge"><b>AI</b>质量流程化</div>
+          </div>
+        </div>
+        <span class="pin">02 · profile · candidate</span>
+      </section>
+
+      <!-- ═══ 3 · 定位 (void-page manifesto · dark) ═════════════════ -->
+      <section class="void-page dark deck-grid" data-background="#14130f">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="void-frame">
+          <div class="void-body">
+            <span class="kicker">Plate C · position statement</span>
+            <h2>我做的不是<em>测试执行</em>,而是把质量问题<br>拆成可自动化、可观测、<em>可复测</em>、可评审的工程系统<span class="nbr">。</span></h2>
+            <p>三条证据链合起来证明的是工程化能力 —— 把游戏项目里的重复验证、复杂排查和质量风险,抽象成自动化框架、测试工具、性能专项和 AI 辅助流程。</p>
+          </div>
+          <div class="void-foot">
+            <div>
+              <span>证据链 · 01</span>
+              <b>UE 自动化框架</b>
+            </div>
+            <div>
+              <span>证据链 · 02</span>
+              <b>客户端性能体系</b>
+            </div>
+            <div>
+              <span>证据链 · 03</span>
+              <b>AI 质量工程</b>
+            </div>
+          </div>
+        </div>
+        <span class="pin">03 · position · claim</span>
+      </section>
+
+      <!-- ═══ 4 · 能力矩阵 ═══════════════════════════════════════════ -->
+      <section class="matrix deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate D · capability matrix</span>
+          <h2>四个能力维度,每一条都有项目证据和面试结论。</h2>
+        </div>
+        <div class="matrix-grid cols-3">
+          <div class="mh corner">岗位能力</div>
+          <div class="mh">项目证据</div>
+          <div class="mh">面试结论</div>
+
+          <div class="row-label">自动化体系</div>
+          <div class="cell"><span class="desc">4 个 UE 项目复用 · 三端执行层 · 约 100 条冒烟用例</span></div>
+          <div class="cell"><span class="desc">能建设项目级自动化框架,不只是写脚本</span></div>
+
+          <div class="row-label">专项能力</div>
+          <div class="cell fill"><span class="desc">MW 性能热力图 · World Partition · 资源动态扫描 · 温度专项</span></div>
+          <div class="cell fill"><span class="desc">能从大盘指标钻到渲染、资源、温度级定位</span></div>
+
+          <div class="row-label">工具平台</div>
+          <div class="cell"><span class="desc">GPM 展示 · Terminal / viewer · 报告上报 · 每日回归</span></div>
+          <div class="cell"><span class="desc">能让数据沉淀并被团队使用</span></div>
+
+          <div class="row-label tr-last">AI 探索</div>
+          <div class="cell tr-last"><span class="desc">测试用例助手 · 线上卡顿 Agent · RAG / VLM / Workflow</span></div>
+          <div class="cell tr-last"><span class="desc">能把 AI 放进质量流程,而不只是概念验证</span></div>
+        </div>
+        <span class="pin">04 · matrix · capability</span>
+      </section>
+
+      <!-- ═══ 5 · UE 框架五层架构 ════════════════════════════════════ -->
+      <section class="cutaway deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate E · framework stack-up · project 01</span>
+          <h2>五层框架,把 UE 黑盒渲染 UI 转成对象模型。</h2>
+          <p class="lede">GAutomator 向 UE5 扩展,补平台 adapter 即可复用业务用例 —— 这不是脚本层封装,是 UE 插件 / SDK 源码级适配。</p>
+        </div>
+        <div class="stack">
+          <div class="layer">
+            <span class="id">L 05</span>
+            <h3>业务用例层</h3>
+            <p>登录、移动、战斗、载具、射击、性能路线 —— 上层描述业务动作,不直接写底层控件路径。</p>
+            <div class="gauge"><b>用例</b>业务动作</div>
+          </div>
+          <div class="layer">
+            <span class="id">L 04</span>
+            <h3>统一执行层</h3>
+            <p>click · swipe · input · screenshot · press_key —— 屏蔽 Android / iOS / PC 输入差异。</p>
+            <div class="gauge"><b>5 verbs</b>屏蔽三端</div>
+          </div>
+          <div class="layer featured">
+            <span class="id">L 03</span>
+            <h3>UE 对象层</h3>
+            <p>组件树 · object id · bounds · 属性 · Actor / Component —— 把 UE 黑盒 UI 转成可理解的对象模型。</p>
+            <div class="gauge stat"><b>对象模型</b>核心抽象</div>
+          </div>
+          <div class="layer">
+            <span class="id">L 02</span>
+            <h3>平台执行器</h3>
+            <p>Android UIAutomator2 · iOS WDA · PC executor —— 补平台 adapter 即可复用业务用例。</p>
+            <div class="gauge"><b>3 端</b>adapter 复用</div>
+          </div>
+          <div class="layer">
+            <span class="id">L 01</span>
+            <h3>质量输出层</h3>
+            <p>截图、日志、报告、GPM 展示、失败归因 —— 让自动化结果可定位、可追溯、可回归。</p>
+            <div class="gauge"><b>闭环</b>可回归</div>
+          </div>
+        </div>
+        <span class="pin">05 · cutaway · framework</span>
+      </section>
+
+      <!-- ═══ 6 · 找/点/控机制 section-cut ════════════════════════════ -->
+      <section class="section-cut deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="meta">
+          <span class="kicker">Plate F · section B-B · mechanism</span>
+          <h2>组件树解决"找得到",坐标映射解决"点得准",消息通道解决"控得住<span class="nbr">。"</span></h2>
+          <p class="lede">三段机制把 UE 黑盒渲染 UI 转成可操作、可控制的对象系统。UE 返回世界坐标、UI 局部坐标或 viewport 坐标,需要完整变换链才能落到设备屏幕。</p>
+          <div class="legend">
+            <div><span class="sw fill"></span>组件树 · object id</div>
+            <div><span class="sw cut"></span>坐标变换链</div>
+            <div><span class="sw dash"></span>消息通道 · 真实控制</div>
+          </div>
+          <div class="source">source · GAutomator UE5 适配 · 4 项目 / 三端 / 约 100 用例</div>
+        </div>
+        <div class="drawing" data-qa-surface="mechanism-drawing">
+          <svg viewBox="0 0 640 380" stroke="var(--c-fg)" fill="none" stroke-width="1.4" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <marker id="m-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 7 4 L 0 7 Z" fill="var(--c-accent)"/>
+              </marker>
+            </defs>
+
+            <!-- 三层坐标空间:UE 世界 → viewport → 设备屏幕 -->
+            <!-- Layer 1: UE 世界坐标 -->
+            <rect x="24" y="36" width="180" height="120" stroke-width="2"/>
+            <text class="svg-label" x="114" y="58" fill="var(--c-fg)">UE 世界 / 局部</text>
+            <circle cx="114" cy="104" r="8" fill="var(--c-accent)"/>
+            <line x1="114" y1="104" x2="160" y2="60" stroke="var(--c-fg)" stroke-width="0.8"/>
+            <line x1="114" y1="104" x2="114" y2="140" stroke="var(--c-fg)" stroke-width="0.8"/>
+            <text class="callout" x="172" y="62">(x,y,z)</text>
+            <text class="callout" x="124" y="148">actor</text>
+
+            <!-- 变换箭头 1 -->
+            <line x1="214" y1="96" x2="262" y2="96" stroke="var(--c-accent)" stroke-width="2" marker-end="url(#m-arrow)"/>
+            <text class="callout" x="222" y="84" fill="var(--c-accent)">viewport 映射</text>
+
+            <!-- Layer 2: viewport -->
+            <rect x="268" y="36" width="180" height="120" stroke-width="2"/>
+            <text class="svg-label" x="358" y="58" fill="var(--c-fg)">游戏 viewport</text>
+            <rect x="300" y="76" width="116" height="64" fill="var(--c-fg)" opacity="0.08"/>
+            <circle cx="358" cy="108" r="8" fill="var(--c-accent)"/>
+            <text class="callout" x="368" y="112">object id</text>
+
+            <!-- 变换箭头 2 -->
+            <line x1="458" y1="96" x2="506" y2="96" stroke="var(--c-accent)" stroke-width="2" marker-end="url(#m-arrow)"/>
+            <text class="callout" x="466" y="84" fill="var(--c-accent)">屏幕坐标映射</text>
+
+            <!-- Layer 3: 设备屏幕 (Android 状态栏/导航栏裁切) -->
+            <rect x="512" y="36" width="108" height="180" stroke-width="2"/>
+            <rect x="512" y="36" width="108" height="14" fill="var(--c-fg)"/>
+            <text class="callout" x="566" y="46" fill="var(--c-bg)" text-anchor="middle">状态栏</text>
+            <rect x="512" y="202" width="108" height="14" fill="var(--c-fg)"/>
+            <text class="callout" x="566" y="212" fill="var(--c-bg)" text-anchor="middle">导航栏</text>
+            <circle cx="566" cy="124" r="8" fill="var(--c-accent)"/>
+            <text class="svg-label" x="566" y="160" fill="var(--c-fg)">设备屏幕</text>
+
+            <!-- 底部:消息通道 / object id 真实控制 -->
+            <line x1="24" y1="200" x2="616" y2="200" stroke="var(--c-fg)" stroke-width="1.5"/>
+            <!-- object id 标题移至 HTML overlay,规避 SVG text bbox 检测误判 -->
+
+            <!-- object id 控制目标 -->
+            <rect x="40" y="256" width="140" height="64" fill="var(--c-bg-paper)" stroke="var(--c-fg)" stroke-width="1.5"/>
+            <text class="svg-label" x="110" y="284" fill="var(--c-fg)">click / 事件</text>
+            <text class="callout" x="110" y="304" text-anchor="middle">不只是 UI 点击</text>
+
+            <rect x="200" y="256" width="140" height="64" fill="var(--c-bg-paper)" stroke="var(--c-fg)" stroke-width="1.5"/>
+            <text class="svg-label" x="270" y="284" fill="var(--c-fg)">相机控制</text>
+            <text class="callout" x="270" y="304" text-anchor="middle">视角 · 旋转</text>
+
+            <rect x="360" y="256" width="140" height="64" fill="var(--c-accent)" opacity="0.18" stroke="var(--c-accent)" stroke-width="1.5"/>
+            <text class="svg-label" x="430" y="284" fill="var(--c-accent)">角色对象</text>
+            <text class="callout" x="430" y="304" text-anchor="middle" fill="var(--c-accent)">UE 广播触发</text>
+
+            <rect x="520" y="256" width="96" height="64" fill="var(--c-bg-paper)" stroke="var(--c-fg)" stroke-width="1.5"/>
+            <text class="svg-label" x="568" y="284" fill="var(--c-fg)">场景构造</text>
+            <text class="callout" x="568" y="304" text-anchor="middle">复杂复测</text>
+
+            <!-- 连线:从顶部坐标到控制目标 -->
+            <path d="M 110 168 C 110 200, 110 200, 110 256" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4"/>
+
+            <!-- 维度标注右下 -->
+            <line x1="24" y1="346" x2="616" y2="346" stroke="var(--c-rule)"/>
+            <text class="callout" x="40" y="362" fill="var(--c-fg-3)">section B-B · 1 : 1 · 三层坐标变换 + object id 控制</text>
+          </svg>
+          <div style="position:absolute; left:64px; top:256px; font-family:var(--f-narrow); font-size:13px; font-weight:700; letter-spacing:0.06em; color:var(--c-fg); background:var(--c-bg-paper); padding:3px 10px; border:1.5px solid var(--c-fg); white-space:nowrap;">object id · 消息通道 · 真实控制</div>
+        </div>
+        <span class="pin">06 · section · mechanism</span>
+      </section>
+
+      <!-- ═══ 7 · 录制回放 route ═════════════════════════════════════ -->
+      <section class="route deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate G · record &amp; replay path · project 01</span>
+          <h2>录制 → 回放,主角用 AddMovementInput 行走 —— 源码级适配,不是脚本封装<span class="nbr">。</span></h2>
+        </div>
+        <div class="route-board">
+          <svg class="route-arc" viewBox="0 0 1160 280" preserveAspectRatio="none" data-qa-ignore="decorative">
+            <path d="M 116 168 C 260 96, 380 96, 516 156 S 760 210, 1044 116" stroke="var(--c-fg)" stroke-width="2.4" fill="none"/>
+            <line x1="116" y1="168" x2="1044" y2="168" stroke="var(--c-rule)" stroke-dasharray="4 8"/>
+          </svg>
+          <div class="route-stops c5">
+            <div class="route-stop">
+              <span class="num">— 01 —</span>
+              <h3>注册监听</h3>
+              <p>InputKey / InputAxis 事件,记录玩家操作、人物位置与转向。</p>
+              <span class="path-note">record</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 02 —</span>
+              <h3>输出录制文件</h3>
+              <p>操作 × 位置 × 转向序列化,作为回放基准。</p>
+              <span class="path-note">serialize</span>
+            </div>
+            <div class="route-stop active">
+              <span class="num">— 03 —</span>
+              <h3>解析回放</h3>
+              <p>对游戏输入 InputKey,同时对比位置信息。</p>
+              <span class="path-note">replay</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 04 —</span>
+              <h3>偏差校正</h3>
+              <p>差距过大重置;运动速度远超进度时合并移动输入。</p>
+              <span class="path-note">correct</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 05 —</span>
+              <h3>AddMovementInput</h3>
+              <p>主角行走触发行走动画与位置移动,支持 APawn。</p>
+              <span class="path-note">drive</span>
+            </div>
+          </div>
+        </div>
+        <span class="pin">07 · route · record-replay</span>
+      </section>
+
+      <!-- ═══ 8 · 性能采样5步 (matrix 变体 step-strip) ═══════════════ -->
+      <section class="matrix deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate H · sampling protocol · project 02</span>
+          <h2>采样条件不固定,性能回归无可比性 —— 五步钉死点位与视角。</h2>
+          <p class="lede">MW 性能回归的核心不是只采 FPS,而是先固定点位、路线、视角、停留时间和采样方式,使不同版本之间具备可比性。</p>
+        </div>
+        <div class="matrix-grid cols-5">
+          <div class="mh corner">步骤</div>
+          <div class="mh">01 · 选点 / 路线</div>
+          <div class="mh">02 · 等待稳定</div>
+          <div class="mh">03 · 固定采样</div>
+          <div class="mh">04 · 性能采集</div>
+          <div class="mh">05 · 平台展示</div>
+
+          <div class="row-label">动作</div>
+          <div class="cell"><span class="desc">传送角色到目标位置或下一个 World Partition Cell</span></div>
+          <div class="cell"><span class="desc">等待流送、分区更新和资源加载完成</span></div>
+          <div class="cell fill"><span class="desc">角色 actor 绑定相机,八方向旋转,每方向停留若干秒</span></div>
+          <div class="cell"><span class="desc">Capture · StatUnit · FrameStatData</span></div>
+          <div class="cell"><span class="desc">上传 GPM 或报告平台</span></div>
+
+          <div class="row-label tr-last">输出</div>
+          <div class="cell tr-last"><span class="out">固定地图 · 点位 · Cell</span></div>
+          <div class="cell tr-last"><span class="out">排除加载中噪声</span></div>
+          <div class="cell tr-last"><span class="out">截图 · 方向 · 停留时间</span></div>
+          <div class="cell tr-last"><span class="out">Frame / Game / GPU / DrawCall</span></div>
+          <div class="cell tr-last"><span class="out">热力图 · 趋势 · 回归对比</span></div>
+        </div>
+        <span class="pin">08 · matrix · sampling</span>
+      </section>
+
+      <!-- ═══ 9 · 大盘指标钻取 section-cut ═══════════════════════════ -->
+      <section class="section-cut deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="meta">
+          <span class="kicker">Plate I · section C-C · drill-down · project 02</span>
+          <h2>FPS 看流畅,CPU / GPU 看渲染,内存看泄漏,温度看降频<span class="nbr">。</span></h2>
+          <p class="lede">大盘指标先定位异常方向,再用专项工具钻到具体根因 —— 从用户感知一路下钻到渲染管线、资源对象和硬件传感器。</p>
+          <div class="legend">
+            <div><span class="sw fill"></span>大盘指标 · 异常方向</div>
+            <div><span class="sw cut"></span>专项工具 · 根因定位</div>
+            <div><span class="sw dash"></span>钻取路径</div>
+          </div>
+          <div class="source">source · Unreal Insights / RenderDoc / Perfdog / simpleperf</div>
+        </div>
+        <div class="drawing" data-qa-surface="drill-drawing">
+          <svg viewBox="0 0 640 380" stroke="var(--c-fg)" fill="none" stroke-width="1.4" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <marker id="d-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 7 4 L 0 7 Z" fill="var(--c-accent)"/>
+              </marker>
+            </defs>
+
+            <!-- 顶部:大盘指标带 -->
+            <text class="svg-label" x="40" y="34" fill="var(--c-fg)" text-anchor="start">大盘指标</text>
+            <rect x="40" y="48" width="120" height="44" fill="var(--c-fg)" opacity="0.06" stroke="var(--c-fg)"/>
+            <text class="svg-label" x="100" y="76" fill="var(--c-fg)">FPS</text>
+            <rect x="170" y="48" width="120" height="44" fill="var(--c-fg)" opacity="0.06" stroke="var(--c-fg)"/>
+            <text class="svg-label" x="230" y="76" fill="var(--c-fg)">CPU</text>
+            <rect x="300" y="48" width="120" height="44" fill="var(--c-accent)" opacity="0.18" stroke="var(--c-accent)"/>
+            <text class="svg-label" x="360" y="76" fill="var(--c-accent)">GPU</text>
+            <rect x="430" y="48" width="100" height="44" fill="var(--c-fg)" opacity="0.06" stroke="var(--c-fg)"/>
+            <text class="svg-label" x="480" y="76" fill="var(--c-fg)">内存</text>
+            <rect x="540" y="48" width="80" height="44" fill="var(--c-fg)" opacity="0.06" stroke="var(--c-fg)"/>
+            <text class="svg-label" x="580" y="76" fill="var(--c-fg)">温度</text>
+
+            <!-- 钻取连接线 -->
+            <line x1="100" y1="92" x2="100" y2="140" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+            <line x1="230" y1="92" x2="230" y2="140" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+            <line x1="360" y1="92" x2="360" y2="140" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+            <line x1="480" y1="92" x2="480" y2="140" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+            <line x1="580" y1="92" x2="580" y2="140" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+
+            <!-- 中部:异常关注点 -->
+            <text class="svg-label" x="40" y="124" fill="var(--c-fg)" text-anchor="start">异常关注点</text>
+            <rect x="48" y="140" width="104" height="56" fill="var(--c-bg-paper)" stroke="var(--c-rule)"/>
+            <text class="callout" x="100" y="166" text-anchor="middle">平稳性 · 卡顿</text>
+            <text class="callout" x="100" y="184" text-anchor="middle">分位数 · 低端机</text>
+
+            <rect x="178" y="140" width="104" height="56" fill="var(--c-bg-paper)" stroke="var(--c-rule)"/>
+            <text class="callout" x="230" y="166" text-anchor="middle">峰值 · 长时高载</text>
+            <text class="callout" x="230" y="184" text-anchor="middle">大小核 · 核频</text>
+
+            <rect x="308" y="140" width="104" height="56" fill="var(--c-bg-paper)" stroke="var(--c-rule)"/>
+            <text class="callout" x="360" y="166" text-anchor="middle">利用率 · 异常</text>
+            <text class="callout" x="360" y="184" text-anchor="middle">点位 / 方向</text>
+
+            <rect x="428" y="140" width="104" height="56" fill="var(--c-bg-paper)" stroke="var(--c-rule)"/>
+            <text class="callout" x="480" y="166" text-anchor="middle">持续上涨</text>
+            <text class="callout" x="480" y="184" text-anchor="middle">退出不回落</text>
+
+            <rect x="528" y="140" width="104" height="56" fill="var(--c-bg-paper)" stroke="var(--c-rule)"/>
+            <text class="callout" x="580" y="166" text-anchor="middle">前段高 · 后段降</text>
+            <text class="callout" x="580" y="184" text-anchor="middle">核频下降</text>
+
+            <!-- 钻取连接到专项工具 -->
+            <line x1="100" y1="196" x2="100" y2="232" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+            <line x1="230" y1="196" x2="230" y2="232" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+            <line x1="360" y1="196" x2="360" y2="232" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+            <line x1="480" y1="196" x2="480" y2="232" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+            <line x1="580" y1="196" x2="580" y2="232" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#d-arrow)"/>
+
+            <!-- 底部:专项工具 -->
+            <text class="svg-label" x="48" y="218" fill="var(--c-fg)" text-anchor="start">专项定位工具</text>
+            <rect x="48" y="236" width="104" height="60" fill="var(--c-fg)" opacity="0.9"/>
+            <text class="svg-label" x="100" y="264" fill="var(--c-bg)" text-anchor="middle">点位 · 方向</text>
+            <text class="callout" x="100" y="284" text-anchor="middle" fill="var(--c-bg)">流畅度钻取</text>
+
+            <rect x="178" y="236" width="104" height="60" fill="var(--c-fg)" opacity="0.9"/>
+            <text class="svg-label" x="230" y="264" fill="var(--c-bg)" text-anchor="middle">Insights</text>
+            <text class="callout" x="230" y="284" text-anchor="middle" fill="var(--c-bg)">simpleperf · Lua/TS 打点</text>
+
+            <rect x="308" y="236" width="104" height="60" fill="var(--c-accent)"/>
+            <text class="svg-label" x="360" y="264" fill="var(--c-bg)" text-anchor="middle">RenderDoc</text>
+            <text class="callout" x="360" y="284" text-anchor="middle" fill="var(--c-bg)">DrawCall · 材质 · Pass</text>
+
+            <rect x="428" y="236" width="104" height="60" fill="var(--c-fg)" opacity="0.9"/>
+            <text class="svg-label" x="480" y="264" fill="var(--c-bg)" text-anchor="middle">memory detail</text>
+            <text class="callout" x="480" y="284" text-anchor="middle" fill="var(--c-bg)">显存 · 堆 · Native</text>
+
+            <rect x="528" y="236" width="104" height="60" fill="var(--c-accent)"/>
+            <text class="svg-label" x="580" y="264" fill="var(--c-bg)" text-anchor="middle">温度专项</text>
+            <text class="callout" x="580" y="284" text-anchor="middle" fill="var(--c-bg)">核频 · 热点 · 降频</text>
+
+            <!-- 底部基线 -->
+            <line x1="40" y1="320" x2="620" y2="320" stroke="var(--c-rule)"/>
+            <text class="callout" x="40" y="342" fill="var(--c-fg-3)">section C-C · 1 : 1 · 大盘 → 异常 → 专项 三层钻取</text>
+          </svg>
+        </div>
+        <span class="pin">09 · section · drill-down</span>
+      </section>
+
+      <!-- ═══ 10 · 资源扫描四件套 cutaway ════════════════════════════ -->
+      <section class="cutaway deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate J · resource scan stack · project 02</span>
+          <h2>不只看包体 —— 四件套覆盖离线规则到运行时反查。</h2>
+          <p class="lede">每日性能回归不是只输出 FPS 曲线,还包括包体、资源、大世界点位和路线的组合输出,把性能回退落到具体资源对象。</p>
+        </div>
+        <div class="stack">
+          <div class="layer">
+            <span class="id">L 04</span>
+            <h3>包体分析</h3>
+            <p>PakViewer / UnrealPak 解包导出资源列表与大小,AssetRegistry 取类型分布。</p>
+            <div class="gauge"><b>离线</b>包体增长</div>
+          </div>
+          <div class="layer">
+            <span class="id">L 03</span>
+            <h3>资源静态扫描</h3>
+            <p>编辑器资源预览系统的扫描类,对美术资源做离线规则扫描。</p>
+            <div class="gauge"><b>离线</b>规范问题</div>
+          </div>
+          <div class="layer featured">
+            <span class="id">L 02</span>
+            <h3>资源动态扫描</h3>
+            <p>运行时遍历 Actor / Component 或已加载 UObject,定位具体资源对象并读取属性。</p>
+            <div class="gauge stat"><b>运行时</b>真实占用</div>
+          </div>
+          <div class="layer">
+            <span class="id">L 01</span>
+            <h3>World Partition</h3>
+            <p>获取 Cell 大小,传送到下个 Cell,等待 streaming 完成,记录性能。</p>
+            <div class="gauge"><b>大世界</b>分区稳定</div>
+          </div>
+        </div>
+        <span class="pin">10 · cutaway · resource</span>
+      </section>
+
+      <!-- ═══ 11 · 动态扫描5步 route ═════════════════════════════════ -->
+      <section class="route deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate K · runtime dump path · project 02</span>
+          <h2>运行时遍历 Actor / Component,反查资源对象的真实占用。</h2>
+          <p class="lede">动态资源扫描关注运行时某个具体已加载资源对象的属性和占用 —— 不是只看包体,也不是只看场景总体资源指标。</p>
+        </div>
+        <div class="route-board">
+          <svg class="route-arc" viewBox="0 0 1160 280" preserveAspectRatio="none" data-qa-ignore="decorative">
+            <path d="M 116 168 C 260 96, 380 96, 516 156 S 760 210, 1044 116" stroke="var(--c-fg)" stroke-width="2.4" fill="none"/>
+            <line x1="116" y1="168" x2="1044" y2="168" stroke="var(--c-rule)" stroke-dasharray="4 8"/>
+          </svg>
+          <div class="route-stops c5">
+            <div class="route-stop">
+              <span class="num">— 01 —</span>
+              <h3>进入场景</h3>
+              <p>自动化传送 / 路线点位 / WP 分区,等待加载稳定。</p>
+              <span class="path-note">setup</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 02 —</span>
+              <h3>触发 Dump</h3>
+              <p>UE 通道 / console / Lua · TS / SDK 触发 DumpRuntimeResources。</p>
+              <span class="path-note">trigger</span>
+            </div>
+            <div class="route-stop active">
+              <span class="num">— 03 —</span>
+              <h3>遍历组件</h3>
+              <p>StaticMesh / Skeletal / Niagara / Decal / Widget 反查引用。</p>
+              <span class="path-note">trace</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 04 —</span>
+              <h3>枚举 UObject</h3>
+              <p>Texture / Mesh / Material,过滤 CDO、Editor-only、无效对象。</p>
+              <span class="path-note">filter</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 05 —</span>
+              <h3>聚合属性</h3>
+              <p>按 asset path 去重,保留实例数、引用、点位、性能。</p>
+              <span class="path-note">aggregate</span>
+            </div>
+          </div>
+        </div>
+        <span class="pin">11 · route · runtime-dump</span>
+      </section>
+
+      <!-- ═══ 12 · 温度专项 section-cut ══════════════════════════════ -->
+      <section class="section-cut deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="meta">
+          <span class="kicker">Plate L · section D-D · thermal · project 02</span>
+          <h2>前段正常后段掉帧,温度专项解释传感器之外的"用户触感<span class="nbr">。"</span></h2>
+          <p class="lede">Perfdog 采集的 CPU / GPU / 电池 / NPU 内部温度不能完全代表用户触感。外壳热点、升温过程和环境条件也需要控制。</p>
+          <div class="legend">
+            <div><span class="sw cut"></span>温度曲线 · 升温过程</div>
+            <div><span class="sw fill"></span>帧率 · 前段稳后段降</div>
+            <div><span class="sw dash"></span>降频拐点 · 热平衡</div>
+          </div>
+          <div class="source">source · 温度测量.pdf · Perfdog + 红外仪器 · 四要素控制</div>
+        </div>
+        <div class="drawing" data-qa-surface="thermal-drawing">
+          <svg viewBox="0 0 640 380" stroke="var(--c-fg)" fill="none" stroke-width="1.4" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <marker id="t-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 7 4 L 0 7 Z" fill="var(--c-accent)"/>
+              </marker>
+            </defs>
+
+            <!-- 坐标轴 -->
+            <line x1="56" y1="40" x2="56" y2="280" stroke-width="2"/>
+            <line x1="56" y1="280" x2="600" y2="280" stroke-width="2"/>
+            <text class="svg-label" x="40" y="44" fill="var(--c-fg)" text-anchor="start">℃ / fps</text>
+            <text class="callout" x="600" y="298" fill="var(--c-fg-3)" text-anchor="end">时间 →</text>
+
+            <!-- Y 轴刻度 -->
+            <line x1="50" y1="80" x2="56" y2="80" stroke="var(--c-fg)"/>
+            <text class="callout" x="44" y="84" text-anchor="end">高</text>
+            <line x1="50" y1="180" x2="56" y2="180" stroke="var(--c-fg)"/>
+            <text class="callout" x="44" y="184" text-anchor="end">中</text>
+            <line x1="50" y1="260" x2="56" y2="260" stroke="var(--c-fg)"/>
+            <text class="callout" x="44" y="264" text-anchor="end">低</text>
+
+            <!-- 温度曲线 (上升) -->
+            <polyline points="80,240 160,230 240,200 320,150 400,90 480,72 560,68" stroke="var(--c-accent)" stroke-width="2.4" fill="none"/>
+            <circle cx="80" cy="240" r="3" fill="var(--c-accent)"/>
+            <circle cx="320" cy="150" r="4" fill="var(--c-accent)"/>
+            <circle cx="560" cy="68" r="4" fill="var(--c-accent)"/>
+
+            <!-- 帧率曲线 (前段稳,后段降) -->
+            <polyline points="80,100 160,98 240,102 320,108 400,160 480,220 560,250" stroke="var(--c-fg)" stroke-width="2.4" fill="none" stroke-dasharray="0"/>
+            <circle cx="80" cy="100" r="3" fill="var(--c-fg)"/>
+            <circle cx="320" cy="108" r="3" fill="var(--c-fg)"/>
+            <circle cx="560" cy="250" r="4" fill="var(--c-fg)"/>
+
+            <!-- 降频拐点标注 -->
+            <line x1="400" y1="90" x2="400" y2="160" stroke="var(--c-accent)" stroke-width="1.2" stroke-dasharray="4 3"/>
+            <circle cx="400" cy="125" r="6" fill="none" stroke="var(--c-accent)" stroke-width="2"/>
+            <text class="svg-label" x="412" y="120" fill="var(--c-accent)" text-anchor="start">降频拐点</text>
+            <text class="callout" x="412" y="138" fill="var(--c-accent)" text-anchor="start">温度 ↑ → 核频 ↓ → fps ↓</text>
+
+            <!-- 前段标注 -->
+            <text class="callout" x="170" y="76" fill="var(--c-fg)" text-anchor="middle">前段:核频高 · fps 稳定</text>
+            <text class="callout" x="520" y="232" fill="var(--c-fg)" text-anchor="middle">后段:升温 · 核频降 · fps 掉</text>
+
+            <!-- 四要素面板 (底部) -->
+            <line x1="56" y1="300" x2="600" y2="300" stroke="var(--c-rule)"/>
+            <text class="svg-label" x="56" y="324" fill="var(--c-fg)" text-anchor="start">四要素控制</text>
+
+            <rect x="56" y="336" width="120" height="34" fill="var(--c-bg-paper)" stroke="var(--c-fg)" stroke-width="1.2"/>
+            <text class="callout" x="116" y="358" text-anchor="middle">环境 · 风速 · 姿态</text>
+
+            <rect x="184" y="336" width="120" height="34" fill="var(--c-bg-paper)" stroke="var(--c-fg)" stroke-width="1.2"/>
+            <text class="callout" x="244" y="358" text-anchor="middle">手机 · 亮度 · 材质</text>
+
+            <rect x="312" y="336" width="120" height="34" fill="var(--c-bg-paper)" stroke="var(--c-fg)" stroke-width="1.2"/>
+            <text class="callout" x="372" y="358" text-anchor="middle">仪器 · 距离 · 角度</text>
+
+            <rect x="440" y="336" width="160" height="34" fill="var(--c-accent)" opacity="0.18" stroke="var(--c-accent)" stroke-width="1.2"/>
+            <text class="callout" x="520" y="358" text-anchor="middle" fill="var(--c-accent)">判断 · 升温 · 热平衡</text>
+          </svg>
+        </div>
+        <span class="pin">12 · section · thermal</span>
+      </section>
+
+      <!-- ═══ 13 · AI 用例助手 route (6列变体) ═══════════════════════ -->
+      <section class="route deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate M · AI assistant pipeline · project 03</span>
+          <h2>不是"模型凭空写用例" —— 六阶段把多源上下文串成证据链<span class="nbr">。</span></h2>
+          <p class="lede">关键不是"AI 生成用例",而是把多源上下文、来源追溯、缺口补检索、多视角分析和规则门禁串起来,让模型基于证据提炼测试点。</p>
+        </div>
+        <div class="route-board">
+          <svg class="route-arc" viewBox="0 0 1160 280" preserveAspectRatio="none" data-qa-ignore="decorative">
+            <path d="M 96 168 C 220 96, 340 96, 466 156 S 700 210, 1064 116" stroke="var(--c-fg)" stroke-width="2.4" fill="none"/>
+            <line x1="96" y1="168" x2="1064" y2="168" stroke="var(--c-rule)" stroke-dasharray="4 8"/>
+          </svg>
+          <div class="route-stops c6">
+            <div class="route-stop">
+              <span class="num">— 01 —</span>
+              <h3>多源输入</h3>
+              <p>需求 · diff · 评审 · 原型 · 历史用例 · RAG</p>
+              <span class="path-note">context</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 02 —</span>
+              <h3>VLM 转文</h3>
+              <p>原型图 / 图片 → 文本块,统一文本链路</p>
+              <span class="path-note">vision</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 03 —</span>
+              <h3>主题抽象</h3>
+              <p>关键词 · 实体 · 模块 · 场景抽取</p>
+              <span class="path-note">topic</span>
+            </div>
+            <div class="route-stop active">
+              <span class="num">— 04 —</span>
+              <h3>缺口补检索</h3>
+              <p>测试者视角列不明项,二次检索补全</p>
+              <span class="path-note">retrieve</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 05 —</span>
+              <h3>多视角生成</h3>
+              <p>功能侧看需求 · 代码侧看 diff 影响</p>
+              <span class="path-note">generate</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 06 —</span>
+              <h3>规则门禁</h3>
+              <p>格式 · 定词 · 字段 · 来源 · 查重</p>
+              <span class="path-note">gate</span>
+            </div>
+          </div>
+        </div>
+        <span class="pin">13 · route · ai-pipeline</span>
+      </section>
+
+      <!-- ═══ 14 · AI 风控5条 cutaway ═══════════════════════════════ -->
+      <section class="cutaway deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate N · risk controls · project 03</span>
+          <h2>AI 输出不直接入库 —— 五道闸门保留来源、追溯和人工评审。</h2>
+          <p class="lede">每一块输入标明来源,生成区分事实与推测,缺失信息不编造,最终输出经规则脚本和人工评审才能落地。</p>
+        </div>
+        <div class="stack">
+          <div class="layer">
+            <span class="id">G 05</span>
+            <h3>来源标注</h3>
+            <p>每一块输入材料标明来源,便于追溯和责任定位。</p>
+            <div class="gauge"><b>追溯</b>可定位</div>
+          </div>
+          <div class="layer">
+            <span class="id">G 04</span>
+            <h3>事实区分</h3>
+            <p>生成过程要求模型区分事实、推测和待确认项。</p>
+            <div class="gauge"><b>区分</b>不混淆</div>
+          </div>
+          <div class="layer featured">
+            <span class="id">G 03</span>
+            <h3>缺失补检索</h3>
+            <p>缺失信息不允许编造,必须列为不确定项或触发二次检索。</p>
+            <div class="gauge stat"><b>防幻觉</b>核心闸门</div>
+          </div>
+          <div class="layer">
+            <span class="id">G 02</span>
+            <h3>规则脚本</h3>
+            <p>检查格式、固定术语、必要字段和重复用例。</p>
+            <div class="gauge"><b>结构化</b>可入库</div>
+          </div>
+          <div class="layer">
+            <span class="id">G 01</span>
+            <h3>人工评审</h3>
+            <p>AI 输出不直接入库,仍需测试和开发评审确认。</p>
+            <div class="gauge"><b>闭环</b>人确认</div>
+          </div>
+        </div>
+        <span class="pin">14 · cutaway · risk-gate</span>
+      </section>
+
+      <!-- ═══ 15 · 卡顿 Agent route ═════════════════════════════════ -->
+      <section class="route deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate O · agent workflow · project 04</span>
+          <h2>把"看数 → 分析 → 复测 → 通知"的人工 SOP 串成 Agent 闭环。</h2>
+          <p class="lede">价值不是简单总结报表,而是把线上质量问题的人工分析 SOP 结构化,让 Agent 按阶段关联埋点、判断异常、触发复测和告警。</p>
+        </div>
+        <div class="route-board">
+          <svg class="route-arc" viewBox="0 0 1160 280" preserveAspectRatio="none" data-qa-ignore="decorative">
+            <path d="M 116 168 C 260 96, 380 96, 516 156 S 760 210, 1044 116" stroke="var(--c-fg)" stroke-width="2.4" fill="none"/>
+            <line x1="116" y1="168" x2="1044" y2="168" stroke="var(--c-rule)" stroke-dasharray="4 8"/>
+          </svg>
+          <div class="route-stops c5">
+            <div class="route-stop">
+              <span class="num">— 01 —</span>
+              <h3>报表读取</h3>
+              <p>版本 · 设备 · 场景 · 阶段耗时 · 帧率等数据。</p>
+              <span class="path-note">read</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 02 —</span>
+              <h3>阶段关联</h3>
+              <p>启动 · 加载 · 进局 · 战斗 · 结算 串联埋点。</p>
+              <span class="path-note">correlate</span>
+            </div>
+            <div class="route-stop active">
+              <span class="num">— 03 —</span>
+              <h3>归因影响</h3>
+              <p>版本 · 设备 · 场景 · 人群 · 持续 → 事实 / 推测 / 待验证。</p>
+              <span class="path-note">attribute</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 04 —</span>
+              <h3>线下复测</h3>
+              <p>按线上异常条件生成复测环境并触发自动化。</p>
+              <span class="path-note">replay</span>
+            </div>
+            <div class="route-stop">
+              <span class="num">— 05 —</span>
+              <h3>告警报告</h3>
+              <p>聚合证据并推送负责人,可行动的问题摘要。</p>
+              <span class="path-note">alert</span>
+            </div>
+          </div>
+        </div>
+        <span class="pin">15 · route · agent</span>
+      </section>
+
+      <!-- ═══ 16 · 面试追问策略 matrix ═══════════════════════════════ -->
+      <section class="matrix deck-grid" data-background="#ebe6dc">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="north-mark"><span class="n">N</span><svg viewBox="0 0 60 60" stroke="var(--c-fg)" fill="none" stroke-width="1.6"><circle cx="30" cy="30" r="22"/><path d="M 30 8 L 36 30 L 30 26 L 24 30 Z" fill="var(--c-fg)"/></svg></div>
+        <div class="head">
+          <span class="kicker">Plate P · interview response map</span>
+          <h2>五类追问,五套回答结构,每套都带主动证据。</h2>
+          <p class="lede">不被动应答,每类追问都先给结构再补证据 —— 把面试变成主动展示工程化能力的窗口。</p>
+        </div>
+        <div class="matrix-grid cols-3">
+          <div class="mh corner">追问</div>
+          <div class="mh">回答结构</div>
+          <div class="mh">主动证据</div>
+
+          <div class="row-label">GAutomator</div>
+          <div class="cell"><span class="desc">原生能力不足 → 跨端执行层 → UE 对象树 → 坐标映射 → 业务 / 对象通道</span></div>
+          <div class="cell"><span class="desc">4 个 UE 项目 · 三端 · 约 100 条冒烟用例</span></div>
+
+          <div class="row-label">性能怎么做</div>
+          <div class="cell fill"><span class="desc">固定采样条件 → 大盘指标 → 专项工具 → 报告闭环</span></div>
+          <div class="cell fill"><span class="desc">热力图 · GPM · World Partition · 温度专项</span></div>
+
+          <div class="row-label">资源扫描</div>
+          <div class="cell"><span class="desc">运行时插件 → Actor / Component 遍历 → 资源对象 → 属性读取 → 点位绑定</span></div>
+          <div class="cell"><span class="desc">Mesh 三角数 · Texture mip · Material 引用 · Niagara 实例</span></div>
+
+          <div class="row-label">AI 怎么落地</div>
+          <div class="cell"><span class="desc">多源上下文 → 缺口检索 → 多视角生成 → 规则门禁 → 人工评审</span></div>
+          <div class="cell"><span class="desc">来源追溯 · VLM / RAG · 规则脚本 · 人工评审</span></div>
+
+          <div class="row-label tr-last">风险怎么控</div>
+          <div class="cell tr-last"><span class="desc">测试环境 · 白名单 · 日志 · 人工确认 · 只读优先</span></div>
+          <div class="cell tr-last"><span class="desc">Lua / TS 注入 · object id 控制 · Agent 不直接改生产状态</span></div>
+        </div>
+        <span class="pin">16 · matrix · response-map</span>
+      </section>
+
+      <!-- ═══ 17 · 定位收尾 void-page · dark ════════════════════════ -->
+      <section class="void-page dark deck-grid" data-background="#14130f">
+        <div class="sheet-frame" data-qa-ignore="decorative"></div>
+        <div class="void-frame">
+          <div class="void-body">
+            <span class="kicker">Plate Q · closing · 1 : 50</span>
+            <h2>自动化框架 · 性能专项 · AI 流程<br>三件证据合起来证明<em class="nbr">工程化能力</em><span class="nbr">。</span></h2>
+            <p>最终要让面试官记住的不是某个工具名,而是工程化能力:能把游戏项目里的重复验证、复杂排查和质量风险,抽象成自动化框架、测试工具、性能专项和 AI 辅助流程。</p>
+          </div>
+          <div class="void-foot">
+            <div>
+              <span>证据链 · 01</span>
+              <b>4 项目 / 三端 / 100 用例</b>
+            </div>
+            <div>
+              <span>证据链 · 02</span>
+              <b>大盘 → 渲染 → 温度</b>
+            </div>
+            <div>
+              <span>证据链 · 03</span>
+              <b>用例助手 + 卡顿 Agent</b>
+            </div>
+          </div>
+        </div>
+        <span class="pin">17 · void · close</span>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.0/dist/reveal.js" integrity="sha384-1BgZRI35wIBSv5NogsksvIdAsgAPqwRFj4SJUH7dDP14i/J8zwleEEcTA1TTHId3" crossorigin="anonymous"></script>
+  <script>
+    Reveal.initialize({
+      width: 1280, height: 720, margin: 0.04,
+      minScale: 0.8, maxScale: 1.2,
+      hash: true, slideNumber: 'c/t', progress: true,
+      center: false, controls: true, controlsTutorial: false,
+      transition: 'fade', transitionSpeed: 'default', backgroundTransition: 'fade',
+    });
+  </script>
+  <script>
+  /* Reveal.js PPTX 导出按钮 — inline of scripts/export-pptx-client.js */
+  (function () {
+    'use strict';
+    var BTN_TEXT='PPTX';
+    function rgbToHex(r,g,b){return [r,g,b].map(function(c){return Math.round(c).toString(16).padStart(2,'0').toUpperCase();}).join('');}
+    function parseRgb(str){if(!str)return null;var m=str.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/);return m?rgbToHex(+m[1],+m[2],+m[3]):null;}
+    function linearToSrgb(c){c=Math.max(0,Math.min(1,c));return c<=0.0031308?12.92*c:1.055*Math.pow(c,1/2.4)-0.055;}
+    function oklchToHex(str){if(!str)return null;var m=str.match(/oklch\(\s*([\d.]+)(%)?\s+([\d.]+)\s+([\d.]+)/);if(!m)return null;var L=m[2]==='%'?+m[1]/100:+m[1];var C=+m[3];var H=+m[4];var a=C*Math.cos(H*Math.PI/180);var b=C*Math.sin(H*Math.PI/180);var l_=L+0.3963377774*a+0.2158037573*b;var m_=L-0.1055613458*a-0.0638541728*b;var s_=L-0.0894841775*a-1.2914855480*b;var l3=l_*l_*l_,m3=m_*m_*m_,s3=s_*s_*s_;var rl=4.0767416621*l3-3.3077115913*m3+0.2309699292*s3;var gl=-1.2684380046*l3+2.6097574011*m3-0.3413193965*s3;var bl=-0.0041960863*l3-0.7034186147*m3+1.7076147010*s3;return rgbToHex(Math.round(Math.min(255,Math.max(0,linearToSrgb(rl)*255))),Math.round(Math.min(255,Math.max(0,linearToSrgb(gl)*255))),Math.round(Math.min(255,Math.max(0,linearToSrgb(bl)*255))));}
+    function anyColorToHex(s){if(!s)return null;if(s.startsWith('#'))return s.replace('#','').substring(0,6).toUpperCase();if(s.startsWith('oklch'))return oklchToHex(s);if(s.startsWith('rgb'))return parseRgb(s);return parseRgb(s);}
+    function resolveColor(v,vars){if(!v)return null;if(v.startsWith('#')&&v.length>=4)return v.replace('#','').substring(0,6).toUpperCase();if(v.startsWith('oklch'))return oklchToHex(v);if(v.startsWith('rgb'))return parseRgb(v);var m=v.match(/var\(\s*(--[\w-]+)\s*\)/);if(m&&vars[m[1]])return resolveColor(vars[m[1]],vars);return parseRgb(v);}
+    function getElColor(el){return anyColorToHex(getComputedStyle(el).color)||'14130F';}
+    function getCssVars(){var vars={};document.querySelectorAll('style').forEach(function(s){var rm=s.textContent.match(/:root\s*\{([^}]+)\}/);if(rm){var re=/(--[\w-]+)\s*:\s*([^;]+)/g,m;while((m=re.exec(rm[1])))vars[m[1]]=m[2].trim();}});var al={'--bg':'--c-bg','--text':'--c-fg','--text-muted':'--c-fg-2','--text-subtle':'--c-fg-3','--accent':'--c-accent','--divider':'--c-border'};Object.keys(al).forEach(function(L){var C=al[L];if(!vars[L]&&vars[C])vars[L]=vars[C];if(!vars[C]&&vars[L])vars[C]=vars[L];});return vars;}
+    function pxToPt(px){return parseFloat(px)*0.75;}
+    function textOf(el){return (el.textContent||'').trim();}
+    var pptx;
+    function exportSection(slide,sec,vars){
+      var bg=resolveColor(vars['--c-bg']||vars['--bg'],vars)||'EBE6DC';
+      slide.background={color:bg};
+      var textMuted=resolveColor(vars['--c-fg-2']||vars['--text-muted'],vars)||'666666';
+      var y=0.55;
+      var kicker=sec.querySelector('.kicker');
+      if(kicker){slide.addText(textOf(kicker),{x:0.55,y:y,w:12.2,h:0.3,fontSize:9,color:textMuted,fontFace:'Calibri',charSpacing:2});y+=0.42;}
+      var h1=sec.querySelector('h1'),h2=sec.querySelector('h2');
+      var head=h1||h2;
+      if(head){var fs=pxToPt(getComputedStyle(head).fontSize);slide.addText(textOf(head),{x:0.55,y:y,w:12.2,h:h1?2.2:1.2,fontSize:Math.min(h1?38:24,fs),color:getElColor(head),fontFace:'Calibri',bold:true,valign:'top',lineSpacingMultiple:1.1});y+=h1?2.4:1.4;}
+      var paras=sec.querySelectorAll('p, .lede, .one-liner');
+      var added=0;
+      paras.forEach(function(p){if(added>=3)return;var t=textOf(p);if(!t||t.length<5)return;var fs=pxToPt(getComputedStyle(p).fontSize);slide.addText(t,{x:0.55,y:y,w:12.2,h:0.7,fontSize:Math.min(13,fs),color:getElColor(p),fontFace:'Calibri',valign:'top',lineSpacingMultiple:1.5,wrap:true});y+=0.8;added++;});
+      var pin=sec.querySelector('.pin');
+      if(pin){slide.addText(textOf(pin),{x:0.55,y:7.0,w:6,h:0.3,fontSize:8,color:resolveColor(vars['--c-fg-3'],vars)||'AAAAAA',fontFace:'Calibri',charSpacing:2});}
+    }
+    var PPTX_SRC='https://cdn.jsdelivr.net/npm/pptxgenjs@4.0.1/dist/pptxgen.bundle.js';
+    var PPTX_INTEGRITY='sha384-qb0Xhi7LLYpvW1HCK6oMrmDLSY9sy7vwm6ZlV6KjtrlL9yg30+YN4neTwnmX+Kp8';
+    function ensurePptx(cb){
+      if(typeof PptxGenJS!=='undefined'){cb();return;}
+      var s=document.createElement('script');
+      s.src=PPTX_SRC; s.crossOrigin='anonymous'; s.integrity=PPTX_INTEGRITY;
+      s.onload=function(){cb();};
+      s.onerror=function(){alert('PptxGenJS 加载失败,请检查网络');var b=document.getElementById('pptx-export-btn');if(b){b.textContent='PPTX';b.disabled=false;}};
+      document.head.appendChild(s);
+    }
+    function doExport(){
+      var btn=document.getElementById('pptx-export-btn');
+      if(btn){btn.textContent='加载模块...';btn.disabled=true;}
+      ensurePptx(function(){var b=document.getElementById('pptx-export-btn');if(b){btn.textContent='导出中...';}runExport();});
+    }
+    function runExport(){
+      var btn=document.getElementById('pptx-export-btn');
+      try{
+        pptx=new PptxGenJS(); pptx.layout='LAYOUT_WIDE';
+        var vars=getCssVars();
+        document.querySelectorAll('.reveal .slides > section').forEach(function(sec){
+          var nested=sec.querySelectorAll(':scope > section');
+          var list=nested.length?Array.from(nested):[sec];
+          list.forEach(function(s){var slide=pptx.addSlide();exportSection(slide,s,vars);});
+        });
+        var name=(document.title||'presentation').replace(/[^\w一-鿿\-]/g,'_');
+        pptx.writeFile({fileName:name+'.pptx'}).then(function(){if(btn){btn.textContent='已导出';setTimeout(function(){btn.textContent=BTN_TEXT;btn.disabled=false;},2000);}});
+      }catch(e){console.error(e);alert('导出失败: '+e.message);if(btn){btn.textContent=BTN_TEXT;btn.disabled=false;}}
+    }
+    function init(){
+      var btn=document.createElement('button');
+      btn.id='pptx-export-btn';btn.textContent=BTN_TEXT;
+      btn.setAttribute('aria-label','导出 PPTX');
+      btn.setAttribute('style','position:fixed;top:16px;right:16px;z-index:9999;padding:6px 12px;background:#f3eee2;color:#14130f;border:1px solid rgba(0,0,0,0.30);border-radius:3px;cursor:pointer;font-size:12px;opacity:0;transition:opacity 0.2s;font-family:system-ui,sans-serif;');
+      btn.onclick=doExport;
+      btn.onmouseenter=function(){btn.style.opacity='1';};
+      btn.onfocus=function(){btn.style.opacity='1';};
+      btn.onmouseleave=function(){btn.style.opacity='0';};
+      btn.onblur=function(){btn.style.opacity='0';};
+      document.body.appendChild(btn);
+      document.addEventListener('mousemove',function(e){btn.style.opacity=(e.clientY<76&&e.clientX>window.innerWidth-110)?'0.9':'0';});
+      document.addEventListener('fullscreenchange',function(){btn.style.display=document.fullscreenElement?'none':'';});
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init); else init();
+  })();
+  </script>
+</body>
+</html>
